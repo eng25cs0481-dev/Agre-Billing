@@ -1,13 +1,19 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useKeyboardShortcuts } from '../../hooks/useKeyboardShortcuts';
 import { supabase, isSupabaseConfigured } from '../../lib/supabase';
+
+const DEFAULT_CATEGORIES = ['Grocery', 'Dairy Products', 'Beverages', 'Packaged Food', 'Personal Care', 'Primary / General'];
+const DEFAULT_UNITS = ['Pcs', 'Kg', 'Ltr', 'Box', 'g', 'm', 'Pkt', 'Doz', 'Nos'];
 
 export default function ProductFormPage() {
   const navigate = useNavigate();
 
   const [name, setName] = useState('');
   const [sku, setSku] = useState('');
+  const [categories, setCategories] = useState<string[]>(DEFAULT_CATEGORIES);
+  const [units, setUnits] = useState<string[]>(DEFAULT_UNITS);
+
   const [categoryName, setCategoryName] = useState('Grocery');
   const [unitName, setUnitName] = useState('Pcs');
   const [costPrice, setCostPrice] = useState<number | ''>('');
@@ -16,6 +22,59 @@ export default function ProductFormPage() {
   const [minStock, setMinStock] = useState<number | ''>('');
   const [saving, setSaving] = useState(false);
   const [savedMessage, setSavedMessage] = useState(false);
+
+  // Fetch real categories and units from Supabase
+  useEffect(() => {
+    if (!isSupabaseConfigured()) return;
+
+    supabase.from('categories').select('name').order('name').then(({ data }) => {
+      if (data && data.length > 0) {
+        const catNames = data.map((c: any) => c.name);
+        setCategories(Array.from(new Set([...catNames, ...DEFAULT_CATEGORIES])));
+      }
+    });
+
+    supabase.from('units').select('symbol').order('symbol').then(({ data }) => {
+      if (data && data.length > 0) {
+        const unitSymbols = data.map((u: any) => u.symbol);
+        setUnits(Array.from(new Set([...unitSymbols, ...DEFAULT_UNITS])));
+      }
+    });
+  }, []);
+
+  const handleCategoryChange = async (val: string) => {
+    if (val === '__NEW__') {
+      const customCat = prompt('Enter New Category / Group Name:');
+      if (customCat && customCat.trim()) {
+        const clean = customCat.trim();
+        setCategories((prev) => [clean, ...prev]);
+        setCategoryName(clean);
+
+        if (isSupabaseConfigured()) {
+          await supabase.from('categories').insert([{ name: clean }]);
+        }
+      }
+    } else {
+      setCategoryName(val);
+    }
+  };
+
+  const handleUnitChange = async (val: string) => {
+    if (val === '__NEW__') {
+      const customUnit = prompt('Enter New Unit Symbol (e.g. Roll, Set, Quintal):');
+      if (customUnit && customUnit.trim()) {
+        const clean = customUnit.trim();
+        setUnits((prev) => [clean, ...prev]);
+        setUnitName(clean);
+
+        if (isSupabaseConfigured()) {
+          await supabase.from('units').insert([{ symbol: clean, name: clean, decimal_places: 0 }]);
+        }
+      }
+    } else {
+      setUnitName(val);
+    }
+  };
 
   const handleSave = async () => {
     if (!name.trim()) {
@@ -113,8 +172,13 @@ export default function ProductFormPage() {
           </div>
 
           <div style={{ borderTop: '1px solid #cadfe8', paddingTop: 12, marginBottom: 16 }}>
-            <div style={{ fontWeight: 800, color: '#0c3c78', fontSize: 11.5, marginBottom: 10, textTransform: 'uppercase' }}>
-              Classification & Units
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 10 }}>
+              <span style={{ fontWeight: 800, color: '#0c3c78', fontSize: 11.5, textTransform: 'uppercase' }}>
+                Classification & Units
+              </span>
+              <span style={{ fontSize: 10.5, color: '#0c3c78', cursor: 'pointer', textDecoration: 'underline' }} onClick={() => navigate('/masters/categories')}>
+                Manage Categories
+              </span>
             </div>
 
             <div style={{ marginBottom: 10, display: 'flex', alignItems: 'center' }}>
@@ -124,14 +188,14 @@ export default function ProductFormPage() {
                 className="tp-party-input"
                 style={{ flex: 1 }}
                 value={categoryName}
-                onChange={(e) => setCategoryName(e.target.value)}
+                onChange={(e) => handleCategoryChange(e.target.value)}
               >
-                <option value="Grocery">Grocery</option>
-                <option value="Dairy">Dairy Products</option>
-                <option value="Beverages">Beverages</option>
-                <option value="Packaged Food">Packaged Food</option>
-                <option value="Personal Care">Personal Care</option>
-                <option value="General">Primary / General</option>
+                {categories.map((c) => (
+                  <option key={c} value={c}>{c}</option>
+                ))}
+                <option value="__NEW__" style={{ fontWeight: 'bold', color: '#0c3c78' }}>
+                  + [Create New Category...]
+                </option>
               </select>
             </div>
 
@@ -142,14 +206,14 @@ export default function ProductFormPage() {
                 className="tp-party-input"
                 style={{ flex: 1 }}
                 value={unitName}
-                onChange={(e) => setUnitName(e.target.value)}
+                onChange={(e) => handleUnitChange(e.target.value)}
               >
-                <option value="Pcs">Pcs (Pieces)</option>
-                <option value="Kg">Kg (Kilograms)</option>
-                <option value="Ltr">Ltr (Litres)</option>
-                <option value="Box">Box (Boxes)</option>
-                <option value="g">g (Grams)</option>
-                <option value="Nos">Nos (Numbers)</option>
+                {units.map((u) => (
+                  <option key={u} value={u}>{u}</option>
+                ))}
+                <option value="__NEW__" style={{ fontWeight: 'bold', color: '#0c3c78' }}>
+                  + [Create New Unit...]
+                </option>
               </select>
             </div>
           </div>

@@ -12,6 +12,8 @@ import CustomerFormPage from './pages/masters/CustomerFormPage';
 import SuppliersPage from './pages/masters/SuppliersPage';
 import SupplierFormPage from './pages/masters/SupplierFormPage';
 import LedgersPage from './pages/masters/LedgersPage';
+import CategoriesPage from './pages/masters/CategoriesPage';
+import UnitsPage from './pages/masters/UnitsPage';
 
 // Transactions
 import SaleVoucherPage from './pages/transactions/SaleVoucherPage';
@@ -55,8 +57,8 @@ export default function App() {
           
           <Route path="/masters/ledgers" element={<LedgersPage />} />
           <Route path="/masters/groups" element={<PlaceholderPage title="Ledger Groups" />} />
-          <Route path="/masters/units" element={<PlaceholderPage title="Units of Measure" />} />
-          <Route path="/masters/categories" element={<PlaceholderPage title="Categories" />} />
+          <Route path="/masters/units" element={<UnitsPage />} />
+          <Route path="/masters/categories" element={<CategoriesPage />} />
 
           {/* Transactions */}
           <Route path="/transactions/sale" element={<SaleVoucherPage />} />
