@@ -6,8 +6,11 @@ import PlaceholderPage from './pages/PlaceholderPage';
 
 // Masters
 import ProductsPage from './pages/masters/ProductsPage';
+import ProductFormPage from './pages/masters/ProductFormPage';
 import CustomersPage from './pages/masters/CustomersPage';
+import CustomerFormPage from './pages/masters/CustomerFormPage';
 import SuppliersPage from './pages/masters/SuppliersPage';
+import SupplierFormPage from './pages/masters/SupplierFormPage';
 import LedgersPage from './pages/masters/LedgersPage';
 
 // Transactions
@@ -39,14 +42,17 @@ export default function App() {
 
           {/* Masters */}
           <Route path="/masters/products" element={<ProductsPage />} />
-          <Route path="/masters/products/new" element={<PlaceholderPage title="New Product Dialog" />} />
-          <Route path="/masters/products/:id" element={<PlaceholderPage title="Edit Product Dialog" />} />
+          <Route path="/masters/products/new" element={<ProductFormPage />} />
+          <Route path="/masters/products/:id" element={<ProductFormPage />} />
+          
           <Route path="/masters/customers" element={<CustomersPage />} />
-          <Route path="/masters/customers/new" element={<PlaceholderPage title="New Customer Dialog" />} />
-          <Route path="/masters/customers/:id" element={<PlaceholderPage title="Edit Customer Dialog" />} />
+          <Route path="/masters/customers/new" element={<CustomerFormPage />} />
+          <Route path="/masters/customers/:id" element={<CustomerFormPage />} />
+          
           <Route path="/masters/suppliers" element={<SuppliersPage />} />
-          <Route path="/masters/suppliers/new" element={<PlaceholderPage title="New Supplier Dialog" />} />
-          <Route path="/masters/suppliers/:id" element={<PlaceholderPage title="Edit Supplier Dialog" />} />
+          <Route path="/masters/suppliers/new" element={<SupplierFormPage />} />
+          <Route path="/masters/suppliers/:id" element={<SupplierFormPage />} />
+          
           <Route path="/masters/ledgers" element={<LedgersPage />} />
           <Route path="/masters/groups" element={<PlaceholderPage title="Ledger Groups" />} />
           <Route path="/masters/units" element={<PlaceholderPage title="Units of Measure" />} />
