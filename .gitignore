@@ -1,0 +1,52 @@
+# Dependencies
+node_modules/
+.pnp
+.pnp.js
+
+# Build outputs
+dist/
+build/
+*.tsbuildinfo
+
+# Environment
+.env
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Tauri
+desktop/src-tauri/target/
+desktop/src-tauri/gen/
+
+# Expo
+mobile/.expo/
+mobile/ios/
+mobile/android/
+
+# Testing
+coverage/
+
+# Logs
+*.log
+npm-debug.log*
+
+# Supabase
+supabase/.temp/
+supabase/.branches/
+
+# SQLite local databases
+*.sqlite
+*.sqlite3
+*.db

@@ -1,0 +1,577 @@
+/* ============================================================
+   Agre Billing — TallyPrime 7.1 Design System & Aesthetic
+   Faithful recreation of TallyPrime UI/UX workflow and visual identity
+   ============================================================ */
+
+:root {
+  /* TallyPrime Signature Palette */
+  --tp-top-blue: #0c3c78;          /* Deep Royal Blue top bar */
+  --tp-top-hover: #164f98;
+  --tp-sub-blue: #72b4de;          /* Sky Blue subheader ribbon */
+  --tp-sub-text: #05264c;
+  
+  /* Work Area Colors */
+  --tp-bg-work: #edf7ee;           /* TallyPrime Pale Mint/Sage voucher work area */
+  --tp-bg-card: #ffffff;
+  --tp-table-header-bg: #e4f2e6;
+  --tp-row-stripe: #f7fcf7;
+  --tp-active-yellow: #fff9c4;     /* Yellow focused active input */
+  --tp-active-border: #f59e0b;
+  --tp-selected-row: #ffb703;      /* Golden amber row selection highlight */
+  --tp-selected-text: #000000;
+  
+  /* Right Sidebar (F-Key Action Bar) */
+  --tp-fbar-bg: #e1eff8;           /* Pale Blue/Ice Gray action bar */
+  --tp-fbar-border: #bcd8eb;
+  --tp-fbar-btn-bg: #f2f8fc;
+  --tp-fbar-btn-hover: #d2e7f5;
+  --tp-fbar-text: #083b6f;
+  --tp-fbar-disabled: #8ea8bf;
+
+  /* Bottom Action Bar */
+  --tp-bottom-bg: #dbeaf5;
+  --tp-bottom-border: #b5d5eb;
+  --tp-bottom-btn: #ffffff;
+
+  /* Typography */
+  --tp-text-main: #111827;
+  --tp-text-muted: #4b5563;
+  --tp-text-blue: #0c3c78;
+  
+  --font-tally: "Segoe UI", Tahoma, Arial, system-ui, -apple-system, sans-serif;
+  --font-mono: "Consolas", "Courier New", monospace;
+  
+  --tp-border: #cadfe8;
+}
+
+*, *::before, *::after {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+html, body {
+  width: 100%;
+  height: 100vh;
+  overflow: hidden;
+  font-family: var(--font-tally);
+  font-size: 12px;
+  background-color: var(--tp-bg-work);
+  color: var(--tp-text-main);
+  user-select: none;
+}
+
+#root {
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+/* ============================================================
+   1. TOP GLOBAL BLUE MENU BAR
+   ============================================================ */
+.tp-topbar {
+  background: var(--tp-top-blue);
+  color: #ffffff;
+  height: 38px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 10px;
+  font-size: 11.5px;
+  flex-shrink: 0;
+  border-bottom: 1px solid #082b58;
+}
+
+.tp-brand-section {
+  display: flex;
+  align-items: baseline;
+  gap: 6px;
+  font-weight: bold;
+  padding-right: 14px;
+  cursor: pointer;
+}
+.tp-brand-logo {
+  font-size: 15px;
+  font-weight: 800;
+  letter-spacing: -0.5px;
+  color: #ffffff;
+}
+.tp-brand-badge {
+  font-size: 9px;
+  background: #f59e0b;
+  color: #000;
+  padding: 1px 4px;
+  border-radius: 2px;
+  font-weight: 800;
+  text-transform: uppercase;
+}
+
+.tp-top-nav {
+  display: flex;
+  align-items: center;
+  gap: 1px;
+}
+.tp-top-btn {
+  padding: 4px 8px;
+  color: #e2edfb;
+  cursor: pointer;
+  border-radius: 2px;
+  display: flex;
+  align-items: center;
+  gap: 3px;
+}
+.tp-top-btn:hover {
+  background: var(--tp-top-hover);
+  color: #ffffff;
+}
+.tp-top-btn.goto {
+  background: #ffffff;
+  color: #0c3c78;
+  font-weight: bold;
+  border-radius: 3px;
+  padding: 3px 12px;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.2);
+}
+.tp-top-btn.goto:hover {
+  background: #f0f7ff;
+}
+
+.tp-search-container {
+  flex: 1;
+  max-width: 450px;
+  margin: 0 16px;
+}
+.tp-search-input {
+  width: 100%;
+  background: #ffffff;
+  border: 1px solid #94bde0;
+  border-radius: 3px;
+  padding: 3px 8px;
+  font-size: 11px;
+  color: #111;
+  outline: none;
+}
+.tp-search-input::placeholder {
+  color: #64748b;
+  font-style: italic;
+}
+
+/* ============================================================
+   2. SUB-HEADER SKY BLUE RIBBON
+   ============================================================ */
+.tp-subribbon {
+  background: var(--tp-sub-blue);
+  color: var(--tp-sub-text);
+  height: 26px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 12px;
+  font-size: 11.5px;
+  font-weight: 700;
+  border-bottom: 1px solid #5a9ec9;
+  flex-shrink: 0;
+}
+.tp-subribbon-title {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+.tp-subribbon-company {
+  font-weight: 800;
+  letter-spacing: 0.3px;
+  text-transform: uppercase;
+}
+.tp-subribbon-date {
+  font-weight: 600;
+  font-size: 11px;
+}
+
+/* ============================================================
+   3. MAIN WORKSPACE WITH RIGHT F-KEY BAR
+   ============================================================ */
+.tp-main-container {
+  flex: 1;
+  display: flex;
+  overflow: hidden;
+  background: var(--tp-bg-work);
+}
+
+.tp-work-area {
+  flex: 1;
+  overflow: auto;
+  padding: 8px 12px;
+  background: var(--tp-bg-work);
+  display: flex;
+  flex-direction: column;
+}
+
+/* ============================================================
+   4. RIGHT F-KEY ACTION SIDEBAR
+   ============================================================ */
+.tp-fbar {
+  width: 155px;
+  background: var(--tp-fbar-bg);
+  border-left: 1px solid var(--tp-fbar-border);
+  display: flex;
+  flex-direction: column;
+  overflow-y: auto;
+  flex-shrink: 0;
+}
+.tp-fbar-btn {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 4px 8px;
+  min-height: 24px;
+  border-bottom: 1px solid var(--tp-fbar-border);
+  background: var(--tp-fbar-btn-bg);
+  color: var(--tp-fbar-text);
+  cursor: pointer;
+  font-size: 11px;
+  font-weight: 600;
+  text-align: left;
+}
+.tp-fbar-btn:hover {
+  background: var(--tp-fbar-btn-hover);
+  color: #04244a;
+}
+.tp-fbar-btn.active {
+  background: #c3dff5;
+  border-left: 3px solid #0c3c78;
+}
+.tp-fbar-btn.disabled {
+  color: var(--tp-fbar-disabled);
+  cursor: default;
+  background: #ebf3f9;
+}
+.tp-fbar-shortcut {
+  font-family: var(--font-mono);
+  font-size: 10.5px;
+  font-weight: bold;
+}
+.tp-fbar-divider {
+  height: 6px;
+  background: var(--tp-fbar-border);
+}
+
+/* ============================================================
+   5. BOTTOM SHORTCUT BAR
+   ============================================================ */
+.tp-bottombar {
+  height: 26px;
+  background: var(--tp-bottom-bg);
+  border-top: 1px solid var(--tp-bottom-border);
+  display: flex;
+  align-items: center;
+  gap: 2px;
+  padding: 0 4px;
+  overflow-x: auto;
+  flex-shrink: 0;
+}
+.tp-bottom-btn {
+  padding: 2px 8px;
+  background: #ffffff;
+  border: 1px solid #a8cce4;
+  border-radius: 2px;
+  color: #0c3c78;
+  font-size: 10.5px;
+  font-weight: 600;
+  cursor: pointer;
+  white-space: nowrap;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+.tp-bottom-btn:hover {
+  background: #e8f4fc;
+  border-color: #0c3c78;
+}
+.tp-bottom-btn kbd {
+  font-weight: bold;
+  color: #d97706;
+}
+
+/* ============================================================
+   6. GATEWAY OF TALLY SCREEN
+   ============================================================ */
+.tp-gateway-container {
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+  padding-top: 30px;
+  height: 100%;
+}
+.tp-gateway-box {
+  width: 480px;
+  background: #ffffff;
+  border: 2px solid #0c3c78;
+  border-radius: 3px;
+  box-shadow: 0 4px 12px rgba(12, 60, 120, 0.15);
+}
+.tp-gateway-header {
+  background: #0c3c78;
+  color: #ffffff;
+  font-weight: bold;
+  text-align: center;
+  padding: 5px 0;
+  font-size: 13px;
+  letter-spacing: 0.5px;
+}
+.tp-gateway-section-title {
+  background: #e1eff8;
+  color: #0c3c78;
+  font-weight: 700;
+  padding: 4px 12px;
+  font-size: 11px;
+  text-transform: uppercase;
+  border-top: 1px solid #bcd8eb;
+  border-bottom: 1px solid #bcd8eb;
+}
+.tp-gateway-menu-item {
+  display: flex;
+  justify-content: space-between;
+  padding: 5px 24px;
+  font-size: 12px;
+  cursor: pointer;
+  color: #1f2937;
+}
+.tp-gateway-menu-item:hover, .tp-gateway-menu-item.selected {
+  background: var(--tp-selected-row);
+  color: #000000;
+  font-weight: 700;
+}
+.tp-gateway-hotkey {
+  font-weight: 800;
+  color: #0c3c78;
+  text-decoration: underline;
+}
+.tp-gateway-menu-item:hover .tp-gateway-hotkey {
+  color: #000000;
+}
+
+/* ============================================================
+   7. VOUCHER ENTRY FORM (SALES / PURCHASE)
+   ============================================================ */
+.tp-voucher-frame {
+  background: var(--tp-bg-work);
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+}
+.tp-voucher-top-info {
+  display: flex;
+  justify-content: space-between;
+  padding: 4px 0;
+  border-bottom: 1px solid #b7d6bc;
+  font-size: 12px;
+}
+.tp-voucher-badge {
+  font-size: 14px;
+  font-weight: 800;
+  color: #0c3c78;
+  text-transform: uppercase;
+  margin-right: 16px;
+}
+.tp-voucher-no-input {
+  background: var(--tp-active-yellow);
+  border: 1px solid #f59e0b;
+  padding: 2px 6px;
+  font-family: var(--font-mono);
+  font-weight: bold;
+  font-size: 12px;
+  color: #000;
+}
+
+.tp-voucher-party-row {
+  display: flex;
+  align-items: center;
+  margin: 6px 0;
+  font-size: 12px;
+}
+.tp-party-label {
+  width: 130px;
+  color: #374151;
+  font-weight: 600;
+}
+.tp-party-input {
+  flex: 1;
+  max-width: 400px;
+  background: #ffffff;
+  border: 1px solid #94bde0;
+  padding: 3px 8px;
+  font-size: 12px;
+}
+.tp-party-input:focus {
+  background: var(--tp-active-yellow);
+  border-color: #f59e0b;
+  outline: none;
+}
+.tp-party-balance {
+  margin-left: 16px;
+  font-size: 11px;
+  color: #4b5563;
+  font-family: var(--font-mono);
+}
+
+/* Tally Table */
+.tp-table-wrap {
+  flex: 1;
+  overflow: auto;
+  border-top: 1px solid #5a9ec9;
+  border-bottom: 1px solid #5a9ec9;
+  background: #ffffff;
+  margin: 6px 0;
+}
+.tp-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 11.5px;
+}
+.tp-table th {
+  background: var(--tp-table-header-bg);
+  color: #05264c;
+  font-weight: 700;
+  border-bottom: 1px solid #99c2a2;
+  border-right: 1px solid #c2dec8;
+  padding: 4px 6px;
+  text-align: left;
+}
+.tp-table th.num, .tp-table td.num {
+  text-align: right;
+  font-family: var(--font-mono);
+}
+.tp-table td {
+  padding: 3px 6px;
+  border-bottom: 1px solid #e5ede6;
+  border-right: 1px solid #e5ede6;
+  color: #111;
+}
+.tp-table tr.selected {
+  background: var(--tp-selected-row) !important;
+  color: #000000 !important;
+  font-weight: 600;
+}
+.tp-table tr:hover:not(.selected) {
+  background: #f0f7f1;
+}
+
+/* Voucher Total & Narration */
+.tp-voucher-bottom {
+  display: flex;
+  justify-content: space-between;
+  padding: 6px 0;
+  border-top: 1px solid #99c2a2;
+}
+.tp-narration-box {
+  flex: 1;
+  max-width: 500px;
+}
+.tp-narration-input {
+  width: 100%;
+  background: #ffffff;
+  border: 1px solid #94bde0;
+  padding: 4px 8px;
+  font-size: 11.5px;
+}
+.tp-narration-input:focus {
+  background: var(--tp-active-yellow);
+  border-color: #f59e0b;
+  outline: none;
+}
+.tp-total-box {
+  text-align: right;
+  min-width: 250px;
+}
+.tp-grand-total {
+  font-size: 16px;
+  font-weight: 800;
+  font-family: var(--font-mono);
+  color: #0c3c78;
+  border-top: 2px solid #0c3c78;
+  padding-top: 4px;
+}
+
+/* ============================================================
+   8. TALLY MODAL / POPUP (PRINT / DIALOG)
+   ============================================================ */
+.tp-modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.4);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 100;
+}
+.tp-modal-box {
+  background: #ffffff;
+  border: 2px solid #0c3c78;
+  width: 520px;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.3);
+  font-size: 12px;
+}
+.tp-modal-title {
+  background: #0c3c78;
+  color: #ffffff;
+  padding: 6px 12px;
+  font-weight: 700;
+  font-size: 13px;
+  display: flex;
+  justify-content: space-between;
+}
+.tp-modal-body {
+  padding: 16px;
+}
+.tp-modal-row {
+  display: flex;
+  margin-bottom: 8px;
+}
+.tp-modal-row-label {
+  width: 160px;
+  font-weight: 600;
+  color: #374151;
+}
+.tp-modal-row-val {
+  flex: 1;
+  font-weight: 700;
+  color: #000;
+}
+.tp-modal-footer {
+  background: #eef5fa;
+  padding: 8px 16px;
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+  border-top: 1px solid #cadfe8;
+}
+.tp-btn {
+  background: #ffffff;
+  border: 1px solid #0c3c78;
+  color: #0c3c78;
+  font-weight: bold;
+  padding: 4px 14px;
+  cursor: pointer;
+  border-radius: 2px;
+  font-size: 11.5px;
+}
+.tp-btn:hover {
+  background: #0c3c78;
+  color: #ffffff;
+}
+.tp-btn.primary {
+  background: #0c3c78;
+  color: #ffffff;
+}
+.tp-btn.primary:hover {
+  background: #164f98;
+}
+
+/* Animations & Spinners */
+.spin {
+  animation: spin 1s linear infinite;
+}
+@keyframes spin {
+  100% { transform: rotate(360deg); }
+}

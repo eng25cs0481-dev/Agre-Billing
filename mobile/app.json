@@ -1,0 +1,27 @@
+{
+  "expo": {
+    "name": "Agre Billing",
+    "slug": "agre-billing",
+    "version": "1.0.0",
+    "orientation": "portrait",
+    "icon": "./assets/icon.png",
+    "userInterfaceStyle": "dark",
+    "splash": {
+      "backgroundColor": "#0a0e27"
+    },
+    "ios": {
+      "supportsTablet": true,
+      "bundleIdentifier": "com.agre.billing"
+    },
+    "android": {
+      "adaptiveIcon": {
+        "backgroundColor": "#0a0e27"
+      },
+      "package": "com.agre.billing"
+    },
+    "plugins": [
+      "expo-asset",
+      "expo-font"
+    ]
+  }
+}

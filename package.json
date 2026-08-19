@@ -1,0 +1,22 @@
+{
+  "name": "agre-billing",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Agre Billing — Shop billing and business management application",
+  "workspaces": [
+    "shared",
+    "desktop",
+    "mobile"
+  ],
+  "scripts": {
+    "dev:desktop": "npm run dev --workspace=desktop",
+    "dev:mobile": "npm run dev --workspace=mobile",
+    "build:shared": "npm run build --workspace=shared",
+    "build:desktop": "npm run build --workspace=desktop",
+    "test": "npm run test --workspace=shared",
+    "test:shared": "npm run test --workspace=shared",
+    "lint": "eslint ."
+  },
+  "author": "Agre",
+  "license": "UNLICENSED"
+}

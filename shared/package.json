@@ -1,0 +1,26 @@
+{
+  "name": "@agre/shared",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Shared business logic, types, validation, and utilities for Agre Billing",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "files": ["dist"],
+  "scripts": {
+    "build": "tsc",
+    "dev": "tsc --watch",
+    "test": "jest --passWithNoTests",
+    "lint": "eslint src/"
+  },
+  "dependencies": {
+    "zod": "^3.23.0",
+    "uuid": "^11.1.0"
+  },
+  "devDependencies": {
+    "@types/uuid": "^10.0.0",
+    "typescript": "^5.8.0",
+    "jest": "^29.7.0",
+    "ts-jest": "^29.3.0",
+    "@types/jest": "^29.5.0"
+  }
+}
