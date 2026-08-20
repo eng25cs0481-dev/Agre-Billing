@@ -56,9 +56,19 @@ export default function MasterListPage<T extends { id: string }>({
     }
   }, [filteredData.length, selectedIndex]);
 
+  const handleDeleteSelected = () => {
+    const item = filteredData[selectedIndex];
+    if (item && onDelete) {
+      onDelete(item);
+    }
+  };
+
   useKeyboardShortcuts([
     { key: 'c', ctrl: true, action: () => onAdd?.(), description: 'Create' },
     { key: 'n', ctrl: true, action: () => onAdd?.(), description: 'New' },
+    { key: 'd', ctrl: true, action: handleDeleteSelected, description: 'Delete' },
+    { key: 'd', alt: true, action: handleDeleteSelected, description: 'Alt+D Delete' },
+    { key: 'Delete', action: handleDeleteSelected, description: 'Delete' },
     { key: 'ArrowDown', action: () => setSelectedIndex((i) => Math.min(i + 1, filteredData.length - 1)), description: 'Down' },
     { key: 'ArrowUp', action: () => setSelectedIndex((i) => Math.max(i - 1, 0)), description: 'Up' },
     {
@@ -113,38 +123,59 @@ export default function MasterListPage<T extends { id: string }>({
                   {col.label}
                 </th>
               ))}
+              {onDelete && <th style={{ width: '70px', textAlign: 'center' }}>Action</th>}
             </tr>
           </thead>
           <tbody>
-            {filteredData.map((item, index) => {
-              const isSelected = index === selectedIndex;
-              return (
-                <tr
-                  key={item.id}
-                  className={isSelected ? 'selected' : ''}
-                  onClick={() => {
-                    setSelectedIndex(index);
-                    onSelect?.(item);
-                  }}
-                  onDoubleClick={() => onEdit?.(item)}
-                  style={{ cursor: 'pointer' }}
-                >
-                  <td style={{ color: '#64748b', fontFamily: 'var(--font-mono)' }}>{index + 1}</td>
-                  {columns.map((col) => (
-                    <td key={col.key} className={col.className}>
-                      {col.render ? col.render(item) : String((item as any)[col.key] ?? '')}
-                    </td>
-                  ))}
-                </tr>
-              );
-            })}
+            {filteredData.length === 0 ? (
+              <tr>
+                <td colSpan={columns.length + (onDelete ? 2 : 1)} style={{ textAlign: 'center', padding: '30px', color: '#64748b' }}>
+                  No records found. Click "+ {addLabel}" or press Ctrl+C to add.
+                </td>
+              </tr>
+            ) : (
+              filteredData.map((item, index) => {
+                const isSelected = index === selectedIndex;
+                return (
+                  <tr
+                    key={item.id}
+                    className={isSelected ? 'selected' : ''}
+                    onClick={() => {
+                      setSelectedIndex(index);
+                      onSelect?.(item);
+                    }}
+                    onDoubleClick={() => onEdit?.(item)}
+                    style={{ cursor: 'pointer' }}
+                  >
+                    <td style={{ color: '#64748b', fontFamily: 'var(--font-mono)' }}>{index + 1}</td>
+                    {columns.map((col) => (
+                      <td key={col.key} className={col.className}>
+                        {col.render ? col.render(item) : String((item as any)[col.key] ?? '')}
+                      </td>
+                    ))}
+                    {onDelete && (
+                      <td style={{ textAlign: 'center', padding: '2px 4px' }} onClick={(e) => e.stopPropagation()}>
+                        <button
+                          className="tp-btn"
+                          style={{ color: '#b91c1c', borderColor: '#fca5a5', padding: '1px 6px', fontSize: '10px' }}
+                          onClick={() => onDelete(item)}
+                          title="Delete (Alt+D)"
+                        >
+                          Delete
+                        </button>
+                      </td>
+                    )}
+                  </tr>
+                );
+              })
+            )}
           </tbody>
         </table>
       </div>
 
       {/* Table Footer Guide */}
       <div style={{ display: 'flex', justifyContent: 'space-between', padding: '4px 0', fontSize: 11, color: '#4b5563' }}>
-        <span>Press Enter to Alter/Select | Arrow Keys ↑ ↓ to navigate</span>
+        <span>Press <strong>Enter</strong> to Edit | <strong>Alt+D</strong> / <strong>Delete</strong> to Remove | Arrow Keys <strong>↑ ↓</strong> to navigate</span>
         <span>Esc to Quit</span>
       </div>
     </div>

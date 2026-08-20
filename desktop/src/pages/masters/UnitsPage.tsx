@@ -63,6 +63,22 @@ export default function UnitsPage() {
     }
   };
 
+  const handleDeleteUnit = async (u: UnitItem) => {
+    const confirmDelete = window.confirm(`Are you sure you want to delete unit "${u.symbol}"?`);
+    if (!confirmDelete) return;
+
+    if (isSupabaseConfigured() && u.id.length > 10) {
+      const { error } = await supabase.from('units').delete().eq('id', u.id);
+      if (error) {
+        alert('Database error: ' + error.message);
+        return;
+      }
+      fetchUnits();
+    } else {
+      setUnits((prev) => prev.filter((item) => item.id !== u.id && item.symbol !== u.symbol));
+    }
+  };
+
   return (
     <MasterListPage
       title="Units of Measure"
@@ -72,6 +88,7 @@ export default function UnitsPage() {
       searchFields={['symbol', 'name'] as any}
       addLabel="New Unit"
       onAdd={handleAddUnit}
+      onDelete={handleDeleteUnit}
     />
   );
 }
