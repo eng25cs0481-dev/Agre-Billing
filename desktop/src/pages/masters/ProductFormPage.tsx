@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useParams } from 'react-router-dom';
 import { useKeyboardShortcuts } from '../../hooks/useKeyboardShortcuts';
 import { supabase, isSupabaseConfigured } from '../../lib/supabase';
 
@@ -8,6 +8,8 @@ const DEFAULT_UNITS = ['Pcs', 'Kg', 'Ltr', 'Box', 'g', 'm', 'Pkt', 'Doz', 'Nos']
 
 export default function ProductFormPage() {
   const navigate = useNavigate();
+  const { id } = useParams<{ id?: string }>();
+  const isEditing = Boolean(id && id !== 'new');
 
   const [name, setName] = useState('');
   const [sku, setSku] = useState('');
@@ -21,9 +23,26 @@ export default function ProductFormPage() {
   const [openingStock, setOpeningStock] = useState<number | ''>('');
   const [minStock, setMinStock] = useState<number | ''>('');
   const [saving, setSaving] = useState(false);
+  const [loading, setLoading] = useState(isEditing);
   const [savedMessage, setSavedMessage] = useState(false);
 
-  // Fetch real categories and units from Supabase
+  // Load existing product when editing
+  useEffect(() => {
+    if (isEditing && id && isSupabaseConfigured()) {
+      supabase.from('products').select('*').eq('id', id).single().then(({ data, error }) => {
+        if (data) {
+          setName(data.name || '');
+          setSku(data.sku || '');
+          setCostPrice(data.cost_price ?? '');
+          setSellingPrice(data.selling_price ?? '');
+          setMinStock(data.minimum_stock ?? '');
+        }
+        setLoading(false);
+      });
+    }
+  }, [id, isEditing]);
+
+  // Fetch categories & units
   useEffect(() => {
     if (!isSupabaseConfigured()) return;
 
@@ -86,19 +105,27 @@ export default function ProductFormPage() {
 
     try {
       if (isSupabaseConfigured()) {
-        const { error } = await supabase.from('products').insert([
-          {
-            name: name.trim(),
-            sku: sku.trim() || undefined,
-            cost_price: Number(costPrice) || 0,
-            selling_price: Number(sellingPrice) || 0,
-            minimum_stock: Number(minStock) || 0,
-            is_active: true,
-          },
-        ]);
+        const payload = {
+          name: name.trim(),
+          sku: sku.trim() || undefined,
+          cost_price: Number(costPrice) || 0,
+          selling_price: Number(sellingPrice) || 0,
+          minimum_stock: Number(minStock) || 0,
+          is_active: true,
+          updated_at: new Date().toISOString(),
+        };
 
-        if (error) {
-          alert('Database Error: ' + error.message);
+        let resultError;
+        if (isEditing && id) {
+          const { error } = await supabase.from('products').update(payload).eq('id', id);
+          resultError = error;
+        } else {
+          const { error } = await supabase.from('products').insert([payload]);
+          resultError = error;
+        }
+
+        if (resultError) {
+          alert('Database Error: ' + resultError.message);
           setSaving(false);
           return;
         }
@@ -121,16 +148,20 @@ export default function ProductFormPage() {
     { key: 'Escape', action: () => navigate('/masters/products'), description: 'Quit' },
   ]);
 
+  if (loading) {
+    return <div style={{ padding: 20, color: '#0c3c78', fontWeight: 'bold' }}>Loading product details...</div>;
+  }
+
   return (
     <div style={{ display: 'flex', flexDirection: 'column', height: '100%' }}>
       {/* Top Breadcrumb */}
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 8 }}>
         <span style={{ fontSize: 13, fontWeight: 'bold', color: '#0c3c78' }}>
-          Stock Item Creation
+          {isEditing ? `Stock Item Alteration — ${name}` : 'Stock Item Creation'}
         </span>
         {savedMessage && (
           <span style={{ color: '#15803d', fontWeight: 'bold', fontSize: 12 }}>
-            ✓ Item Created Successfully
+            ✓ Item {isEditing ? 'Updated' : 'Created'} Successfully
           </span>
         )}
       </div>
@@ -139,8 +170,9 @@ export default function ProductFormPage() {
       <div className="tp-table-wrap" style={{ flex: 1, padding: 16, background: '#edf7ee' }}>
         <div style={{ maxWidth: 650, margin: '0 auto', background: '#ffffff', border: '2px solid #0c3c78', padding: 20, boxShadow: '0 4px 12px rgba(12,60,120,0.1)' }}>
           {/* Header */}
-          <div style={{ background: '#0c3c78', color: '#fff', padding: '6px 12px', fontWeight: 'bold', margin: '-20px -20px 20px -20px', fontSize: 13 }}>
-            Stock Item Creation
+          <div style={{ background: '#0c3c78', color: '#fff', padding: '6px 12px', fontWeight: 'bold', margin: '-20px -20px 20px -20px', fontSize: 13, display: 'flex', justifyContent: 'space-between' }}>
+            <span>{isEditing ? 'Stock Item Alteration' : 'Stock Item Creation'}</span>
+            {isEditing && <span style={{ fontSize: 11, color: '#f59e0b' }}>[ALTER MODE]</span>}
           </div>
 
           {/* Name & SKU */}
@@ -291,7 +323,7 @@ export default function ProductFormPage() {
               Quit (Esc)
             </button>
             <button className="tp-btn primary" onClick={handleSave} disabled={saving}>
-              {saving ? 'Saving...' : 'Accept (^A)'}
+              {saving ? 'Saving...' : isEditing ? 'Update (^A)' : 'Accept (^A)'}
             </button>
           </div>
         </div>

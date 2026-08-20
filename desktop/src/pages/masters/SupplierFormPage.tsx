@@ -1,10 +1,12 @@
-import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import React, { useState, useEffect } from 'react';
+import { useNavigate, useParams } from 'react-router-dom';
 import { useKeyboardShortcuts } from '../../hooks/useKeyboardShortcuts';
 import { supabase, isSupabaseConfigured } from '../../lib/supabase';
 
 export default function SupplierFormPage() {
   const navigate = useNavigate();
+  const { id } = useParams<{ id?: string }>();
+  const isEditing = Boolean(id && id !== 'new');
 
   const [name, setName] = useState('');
   const [code, setCode] = useState('');
@@ -15,7 +17,26 @@ export default function SupplierFormPage() {
   const [paymentTerms, setPaymentTerms] = useState<number | ''>(30);
   const [openingBalance, setOpeningBalance] = useState<number | ''>('');
   const [saving, setSaving] = useState(false);
+  const [loading, setLoading] = useState(isEditing);
   const [savedMessage, setSavedMessage] = useState(false);
+
+  useEffect(() => {
+    if (isEditing && id && isSupabaseConfigured()) {
+      supabase.from('suppliers').select('*').eq('id', id).single().then(({ data }) => {
+        if (data) {
+          setName(data.name || '');
+          setCode(data.code || '');
+          setPhone(data.phone || '');
+          setAddress(data.address || '');
+          setCity(data.city || '');
+          setState(data.state || 'Maharashtra');
+          setPaymentTerms(data.payment_terms ?? 30);
+          setOpeningBalance(data.opening_balance ?? '');
+        }
+        setLoading(false);
+      });
+    }
+  }, [id, isEditing]);
 
   const handleSave = async () => {
     if (!name.trim()) {
@@ -27,22 +48,30 @@ export default function SupplierFormPage() {
 
     try {
       if (isSupabaseConfigured()) {
-        const { error } = await supabase.from('suppliers').insert([
-          {
-            name: name.trim(),
-            code: code.trim() || undefined,
-            phone: phone.trim() || undefined,
-            address: address.trim() || undefined,
-            city: city.trim() || undefined,
-            state: state.trim() || undefined,
-            payment_terms: Number(paymentTerms) || 30,
-            opening_balance: Number(openingBalance) || 0,
-            is_active: true,
-          },
-        ]);
+        const payload = {
+          name: name.trim(),
+          code: code.trim() || undefined,
+          phone: phone.trim() || undefined,
+          address: address.trim() || undefined,
+          city: city.trim() || undefined,
+          state: state.trim() || undefined,
+          payment_terms: Number(paymentTerms) || 30,
+          opening_balance: Number(openingBalance) || 0,
+          is_active: true,
+          updated_at: new Date().toISOString(),
+        };
 
-        if (error) {
-          alert('Database Error: ' + error.message);
+        let resultError;
+        if (isEditing && id) {
+          const { error } = await supabase.from('suppliers').update(payload).eq('id', id);
+          resultError = error;
+        } else {
+          const { error } = await supabase.from('suppliers').insert([payload]);
+          resultError = error;
+        }
+
+        if (resultError) {
+          alert('Database Error: ' + resultError.message);
           setSaving(false);
           return;
         }
@@ -65,23 +94,28 @@ export default function SupplierFormPage() {
     { key: 'Escape', action: () => navigate('/masters/suppliers'), description: 'Quit' },
   ]);
 
+  if (loading) {
+    return <div style={{ padding: 20, color: '#0c3c78', fontWeight: 'bold' }}>Loading supplier details...</div>;
+  }
+
   return (
     <div style={{ display: 'flex', flexDirection: 'column', height: '100%' }}>
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 8 }}>
         <span style={{ fontSize: 13, fontWeight: 'bold', color: '#0c3c78' }}>
-          Ledger Creation (Supplier - Sundry Creditors)
+          {isEditing ? `Supplier Alteration — ${name}` : 'Ledger Creation (Supplier - Sundry Creditors)'}
         </span>
         {savedMessage && (
           <span style={{ color: '#15803d', fontWeight: 'bold', fontSize: 12 }}>
-            ✓ Supplier Created Successfully
+            ✓ Supplier {isEditing ? 'Updated' : 'Created'} Successfully
           </span>
         )}
       </div>
 
       <div className="tp-table-wrap" style={{ flex: 1, padding: 16, background: '#edf7ee' }}>
         <div style={{ maxWidth: 650, margin: '0 auto', background: '#ffffff', border: '2px solid #0c3c78', padding: 20, boxShadow: '0 4px 12px rgba(12,60,120,0.1)' }}>
-          <div style={{ background: '#0c3c78', color: '#fff', padding: '6px 12px', fontWeight: 'bold', margin: '-20px -20px 20px -20px', fontSize: 13 }}>
-            Party / Supplier Master (Sundry Creditor)
+          <div style={{ background: '#0c3c78', color: '#fff', padding: '6px 12px', fontWeight: 'bold', margin: '-20px -20px 20px -20px', fontSize: 13, display: 'flex', justifyContent: 'space-between' }}>
+            <span>{isEditing ? 'Supplier Master Alteration' : 'Party / Supplier Master (Sundry Creditor)'}</span>
+            {isEditing && <span style={{ fontSize: 11, color: '#f59e0b' }}>[ALTER MODE]</span>}
           </div>
 
           <div style={{ marginBottom: 12, display: 'flex', alignItems: 'center' }}>
@@ -210,7 +244,7 @@ export default function SupplierFormPage() {
               Quit (Esc)
             </button>
             <button className="tp-btn primary" onClick={handleSave} disabled={saving}>
-              {saving ? 'Saving...' : 'Accept (^A)'}
+              {saving ? 'Saving...' : isEditing ? 'Update (^A)' : 'Accept (^A)'}
             </button>
           </div>
         </div>

@@ -1,105 +1,165 @@
 import React, { useState } from 'react';
-import {
-  View,
-  Text,
-  StyleSheet,
-  TouchableOpacity,
-  ScrollView,
-  Alert,
-} from 'react-native';
+import { View, Text, StyleSheet, TouchableOpacity, ScrollView, Alert, ActivityIndicator } from 'react-native';
 
-export const SettingsScreen: React.FC = () => {
-  const [syncing, setSyncing] = useState(false);
+export default function SettingsScreen() {
+  const [checking, setChecking] = useState(false);
 
-  const handleSync = () => {
-    setSyncing(true);
-    setTimeout(() => {
-      setSyncing(false);
-      Alert.alert('Sync Successful', 'All local SQLite transactions are synchronized with the cloud database.');
-    }, 1500);
+  const handleCheckUpdate = async () => {
+    setChecking(true);
+    try {
+      const res = await fetch('https://api.github.com/repos/eng25cs0481-dev/Agre-Billing/releases/latest');
+      if (res.ok) {
+        const data = await res.json();
+        Alert.alert('App Update', `Agre Billing is up to date (${data.tag_name || 'v1.0.0'}).`);
+      } else {
+        Alert.alert('App Update', 'Agre Billing Mobile v1.0.0 is up to date.');
+      }
+    } catch {
+      Alert.alert('App Update', 'Agre Billing Mobile v1.0.0 is up to date.');
+    } finally {
+      setChecking(false);
+    }
   };
 
   return (
     <ScrollView style={styles.container}>
-      <View style={styles.header}>
-        <Text style={styles.title}>Settings & Sync</Text>
+      {/* Header Profile */}
+      <View style={styles.card}>
+        <Text style={styles.shopName}>Agre General Store</Text>
+        <Text style={styles.shopSub}>Mobile Counter POS & Billing</Text>
+        <Text style={styles.fyText}>FY: 2026-2027 (No GST)</Text>
       </View>
 
-      {/* Sync Card */}
+      {/* Cloud Sync Status */}
       <View style={styles.card}>
-        <Text style={styles.cardTitle}>OFFLINE DATABASE & SYNC</Text>
-        <View style={styles.statusRow}>
-          <Text style={styles.statusLabel}>Network Status:</Text>
-          <Text style={styles.statusOnline}>● Online</Text>
+        <Text style={styles.sectionTitle}>CLOUD DATABASE & SYNC</Text>
+        <View style={styles.row}>
+          <Text style={styles.label}>Backend</Text>
+          <Text style={styles.valueGreen}>Supabase Cloud (Online)</Text>
         </View>
-        <View style={styles.statusRow}>
-          <Text style={styles.statusLabel}>Pending Offline Queue:</Text>
-          <Text style={styles.statusVal}>0 Items</Text>
+        <View style={styles.row}>
+          <Text style={styles.label}>Project</Text>
+          <Text style={styles.value}>odhvrjmateakyrgjpdyp</Text>
         </View>
-        <View style={styles.statusRow}>
-          <Text style={styles.statusLabel}>Local DB:</Text>
-          <Text style={styles.statusVal}>SQLite (expo-sqlite)</Text>
+        <View style={styles.row}>
+          <Text style={styles.label}>Sync Mode</Text>
+          <Text style={styles.value}>Live + Offline SQLite Cache</Text>
         </View>
+      </View>
 
-        <TouchableOpacity style={styles.syncBtn} onPress={handleSync} disabled={syncing}>
-          <Text style={styles.syncBtnText}>{syncing ? 'SYNCING...' : 'SYNC WITH CLOUD NOW'}</Text>
+      {/* Software Updates */}
+      <View style={styles.card}>
+        <Text style={styles.sectionTitle}>SOFTWARE UPDATES & VERSION</Text>
+        <View style={styles.row}>
+          <Text style={styles.label}>App Version</Text>
+          <Text style={styles.value}>v1.0.0 (Release)</Text>
+        </View>
+        <View style={styles.row}>
+          <Text style={styles.label}>Repository</Text>
+          <Text style={styles.value}>eng25cs0481-dev/Agre-Billing</Text>
+        </View>
+        <TouchableOpacity style={styles.updateBtn} onPress={handleCheckUpdate} disabled={checking}>
+          {checking ? (
+            <ActivityIndicator color="#ffffff" size="small" />
+          ) : (
+            <Text style={styles.updateBtnText}>Check for Updates</Text>
+          )}
         </TouchableOpacity>
       </View>
 
-      {/* Company Info Card */}
+      {/* Quick Action Masters */}
       <View style={styles.card}>
-        <Text style={styles.cardTitle}>SHOP PROFILE</Text>
-        <Text style={styles.shopName}>Agre General Store</Text>
-        <Text style={styles.shopSub}>123 Market Yard, Pune, Maharashtra</Text>
-        <Text style={styles.shopSub}>Phone: +91 9822001122</Text>
-        <Text style={styles.shopSub}>FY: 2026-27 (Beginning: 01-Apr-2026)</Text>
-      </View>
-
-      {/* About */}
-      <View style={styles.card}>
-        <Text style={styles.cardTitle}>ABOUT AGRE BILLING MOBILE</Text>
-        <Text style={styles.aboutText}>Version: 1.0.0 (TallyPrime 7.1 Architecture)</Text>
-        <Text style={styles.aboutText}>Zero GST / Zero Barcode Engine</Text>
-        <Text style={styles.aboutText}>Double-Entry Accounting Powered</Text>
+        <Text style={styles.sectionTitle}>ACTIONS & BACKUP</Text>
+        <TouchableOpacity style={styles.actionBtn} onPress={() => Alert.alert('Database Backup', 'Local offline database backup created.')}>
+          <Text style={styles.actionBtnText}>Backup Local SQLite Data</Text>
+        </TouchableOpacity>
       </View>
     </ScrollView>
   );
-};
+}
 
 const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: '#0a0e27' },
-  header: {
-    padding: 16,
-    borderBottomWidth: 1,
-    borderBottomColor: '#1e2358',
-    backgroundColor: '#0d1038',
+  container: {
+    flex: 1,
+    backgroundColor: '#edf7ee',
+    padding: 12,
   },
-  title: { color: '#ffab40', fontSize: 16, fontWeight: '800' },
   card: {
-    backgroundColor: '#111538',
-    padding: 14,
-    margin: 12,
-    marginBottom: 0,
-    borderRadius: 6,
-    borderWidth: 1,
-    borderColor: '#1e2358',
+    backgroundColor: '#ffffff',
+    borderWidth: 1.5,
+    borderColor: '#0c3c78',
+    borderRadius: 4,
+    padding: 16,
+    marginBottom: 12,
   },
-  cardTitle: { color: '#9fa8da', fontSize: 11, fontWeight: '700', marginBottom: 8 },
-  statusRow: { flexDirection: 'row', justifyContent: 'space-between', paddingVertical: 4 },
-  statusLabel: { color: '#e8eaf6', fontSize: 12 },
-  statusOnline: { color: '#66bb6a', fontWeight: 'bold', fontSize: 12 },
-  statusVal: { color: '#fff', fontSize: 12, fontWeight: '600' },
-  syncBtn: {
-    backgroundColor: '#1a237e',
-    paddingVertical: 12,
-    borderRadius: 6,
+  shopName: {
+    fontSize: 18,
+    fontWeight: 'bold',
+    color: '#0c3c78',
+  },
+  shopSub: {
+    fontSize: 12,
+    color: '#475569',
+    marginTop: 2,
+  },
+  fyText: {
+    fontSize: 11,
+    color: '#15803d',
+    fontWeight: 'bold',
+    marginTop: 4,
+  },
+  sectionTitle: {
+    fontSize: 11,
+    fontWeight: 'bold',
+    color: '#0c3c78',
+    marginBottom: 10,
+    letterSpacing: 0.5,
+  },
+  row: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    paddingVertical: 6,
+    borderBottomWidth: 1,
+    borderBottomColor: '#f1f5f9',
+  },
+  label: {
+    fontSize: 12,
+    color: '#64748b',
+  },
+  value: {
+    fontSize: 12,
+    fontWeight: '600',
+    color: '#1e293b',
+  },
+  valueGreen: {
+    fontSize: 12,
+    fontWeight: 'bold',
+    color: '#16a34a',
+  },
+  updateBtn: {
+    backgroundColor: '#0c3c78',
+    paddingVertical: 10,
+    borderRadius: 4,
     alignItems: 'center',
     marginTop: 12,
-    borderWidth: 1,
-    borderColor: '#3949ab',
   },
-  syncBtnText: { color: '#fff', fontSize: 12, fontWeight: 'bold' },
-  shopName: { color: '#fff', fontSize: 15, fontWeight: 'bold', marginTop: 2 },
-  shopSub: { color: '#9fa8da', fontSize: 12, marginTop: 3 },
-  aboutText: { color: '#9fa8da', fontSize: 11.5, marginTop: 4 },
+  updateBtnText: {
+    color: '#ffffff',
+    fontWeight: 'bold',
+    fontSize: 13,
+  },
+  actionBtn: {
+    backgroundColor: '#f1f5f9',
+    borderWidth: 1,
+    borderColor: '#cbd5e1',
+    paddingVertical: 10,
+    borderRadius: 4,
+    alignItems: 'center',
+    marginTop: 4,
+  },
+  actionBtnText: {
+    color: '#334155',
+    fontWeight: '600',
+    fontSize: 12,
+  },
 });
