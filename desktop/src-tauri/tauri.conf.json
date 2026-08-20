@@ -35,13 +35,5 @@
       "icons/icon.icns",
       "icons/icon.ico"
     ]
-  },
-  "plugins": {
-    "updater": {
-      "pubkey": "dGVzdC1wdWJrZXktYWdyZS1iaWxsaW5n",
-      "endpoints": [
-        "https://releases.agre.local/desktop/{{target}}/{{arch}}/{{current_version}}"
-      ]
-    }
   }
 }
