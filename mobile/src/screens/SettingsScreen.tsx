@@ -1,21 +1,52 @@
 import React, { useState } from 'react';
-import { View, Text, StyleSheet, TouchableOpacity, ScrollView, Alert, ActivityIndicator } from 'react-native';
+import { View, Text, StyleSheet, TouchableOpacity, ScrollView, Alert, ActivityIndicator, Linking } from 'react-native';
+
+const CURRENT_VERSION = 'v1.0.0';
+const GITHUB_REPO = 'eng25cs0481-dev/Agre-Billing';
 
 export default function SettingsScreen() {
   const [checking, setChecking] = useState(false);
+  const [latestRelease, setLatestRelease] = useState<{ tag: string; body?: string; downloadUrl?: string } | null>(null);
 
   const handleCheckUpdate = async () => {
     setChecking(true);
     try {
-      const res = await fetch('https://api.github.com/repos/eng25cs0481-dev/Agre-Billing/releases/latest');
+      const res = await fetch(`https://api.github.com/repos/${GITHUB_REPO}/releases/latest`);
       if (res.ok) {
         const data = await res.json();
-        Alert.alert('App Update', `Agre Billing is up to date (${data.tag_name || 'v1.0.0'}).`);
+        const tag = data.tag_name || 'v1.0.0';
+        
+        // Find .apk asset if present
+        let apkUrl = data.html_url;
+        if (data.assets && data.assets.length > 0) {
+          const apkAsset = data.assets.find((a: any) => a.name.endsWith('.apk'));
+          if (apkAsset) {
+            apkUrl = apkAsset.browser_download_url;
+          }
+        }
+
+        if (tag !== CURRENT_VERSION) {
+          setLatestRelease({
+            tag,
+            body: data.body || 'Performance improvements and new features.',
+            downloadUrl: apkUrl,
+          });
+          Alert.alert(
+            'New Version Available! 🎉',
+            `Version ${tag} is available (Current: ${CURRENT_VERSION}).\n\nWould you like to download the update?`,
+            [
+              { text: 'Later', style: 'cancel' },
+              { text: 'Download Update', onPress: () => Linking.openURL(apkUrl) },
+            ]
+          );
+        } else {
+          Alert.alert('Up to Date', `Agre Billing Mobile is on the latest version (${CURRENT_VERSION}).`);
+        }
       } else {
-        Alert.alert('App Update', 'Agre Billing Mobile v1.0.0 is up to date.');
+        Alert.alert('Up to Date', `Agre Billing Mobile is on the latest version (${CURRENT_VERSION}).`);
       }
     } catch {
-      Alert.alert('App Update', 'Agre Billing Mobile v1.0.0 is up to date.');
+      Alert.alert('Update Check', `Agre Billing Mobile ${CURRENT_VERSION} is active.`);
     } finally {
       setChecking(false);
     }
@@ -27,7 +58,7 @@ export default function SettingsScreen() {
       <View style={styles.card}>
         <Text style={styles.shopName}>Agre General Store</Text>
         <Text style={styles.shopSub}>Mobile Counter POS & Billing</Text>
-        <Text style={styles.fyText}>FY: 2026-2027 (No GST)</Text>
+        <Text style={styles.fyText}>FY: 2026-2027 (Zero GST)</Text>
       </View>
 
       {/* Cloud Sync Status */}
@@ -49,22 +80,36 @@ export default function SettingsScreen() {
 
       {/* Software Updates */}
       <View style={styles.card}>
-        <Text style={styles.sectionTitle}>SOFTWARE UPDATES & VERSION</Text>
+        <Text style={styles.sectionTitle}>HOW MOBILE UPDATES WORK</Text>
         <View style={styles.row}>
-          <Text style={styles.label}>App Version</Text>
-          <Text style={styles.value}>v1.0.0 (Release)</Text>
+          <Text style={styles.label}>Installed Version</Text>
+          <Text style={styles.value}>{CURRENT_VERSION}</Text>
         </View>
         <View style={styles.row}>
-          <Text style={styles.label}>Repository</Text>
-          <Text style={styles.value}>eng25cs0481-dev/Agre-Billing</Text>
+          <Text style={styles.label}>Update Channel</Text>
+          <Text style={styles.value}>GitHub Releases / OTA</Text>
         </View>
+
+        <Text style={styles.infoText}>
+          When a new version is released on GitHub, you can download and install the new APK directly with 1 tap.
+        </Text>
+
         <TouchableOpacity style={styles.updateBtn} onPress={handleCheckUpdate} disabled={checking}>
           {checking ? (
             <ActivityIndicator color="#ffffff" size="small" />
           ) : (
-            <Text style={styles.updateBtnText}>Check for Updates</Text>
+            <Text style={styles.updateBtnText}>Check for Updates Now</Text>
           )}
         </TouchableOpacity>
+
+        {latestRelease && (
+          <TouchableOpacity
+            style={styles.downloadBanner}
+            onPress={() => latestRelease.downloadUrl && Linking.openURL(latestRelease.downloadUrl)}
+          >
+            <Text style={styles.downloadBannerText}>⬇️ Download Version {latestRelease.tag}</Text>
+          </TouchableOpacity>
+        )}
       </View>
 
       {/* Quick Action Masters */}
@@ -136,6 +181,12 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
     color: '#16a34a',
   },
+  infoText: {
+    fontSize: 11,
+    color: '#64748b',
+    marginTop: 8,
+    lineHeight: 16,
+  },
   updateBtn: {
     backgroundColor: '#0c3c78',
     paddingVertical: 10,
@@ -147,6 +198,18 @@ const styles = StyleSheet.create({
     color: '#ffffff',
     fontWeight: 'bold',
     fontSize: 13,
+  },
+  downloadBanner: {
+    marginTop: 10,
+    backgroundColor: '#15803d',
+    padding: 10,
+    borderRadius: 4,
+    alignItems: 'center',
+  },
+  downloadBannerText: {
+    color: '#ffffff',
+    fontWeight: 'bold',
+    fontSize: 12,
   },
   actionBtn: {
     backgroundColor: '#f1f5f9',
