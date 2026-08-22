@@ -94,7 +94,7 @@ export default function AppLayout() {
           <span>{getScreenTitle()}</span>
         </div>
         <div className="tp-subribbon-company">
-          {company?.name || 'Agre General Store'}
+          {company?.name || 'Agre Machinery And Hardware Stores'}
         </div>
         <div className="tp-subribbon-date">
           {formatDateLong(currentDate)}

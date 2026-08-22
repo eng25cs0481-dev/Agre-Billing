@@ -328,8 +328,8 @@ export default function SaleVoucherPage() {
                 })),
               }}
               company={{
-                name: 'Agre General Store',
-                address: '123 Market Yard Road',
+                name: 'Agre Machinery And Hardware Stores',
+                address: 'Main Market Road',
                 city: 'Pune',
                 state: 'Maharashtra',
                 phone: '9822001122',

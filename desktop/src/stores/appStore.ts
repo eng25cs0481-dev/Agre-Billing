@@ -17,8 +17,24 @@ interface AppState {
   toggleSidebar: () => void;
 }
 
+const DEFAULT_COMPANY: Company = {
+  id: 'main-company',
+  name: 'Agre Machinery And Hardware Stores',
+  address: 'Main Market Road',
+  city: 'Pune',
+  state: 'Maharashtra',
+  phone: '9822001122',
+  email: 'contact@agre.local',
+  currency_code: 'INR',
+  currency_symbol: '₹',
+  decimal_places: 2,
+  books_beginning_date: '2026-04-01',
+  created_at: new Date().toISOString(),
+  updated_at: new Date().toISOString(),
+};
+
 export const useAppStore = create<AppState>((set) => ({
-  company: null,
+  company: DEFAULT_COMPANY,
   financialYear: null,
   currentDate: new Date().toISOString().split('T')[0],
   sidebarCollapsed: false,

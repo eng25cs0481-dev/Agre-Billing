@@ -56,7 +56,7 @@ export default function SettingsScreen() {
     <ScrollView style={styles.container}>
       {/* Header Profile */}
       <View style={styles.card}>
-        <Text style={styles.shopName}>Agre General Store</Text>
+        <Text style={styles.shopName}>Agre Machinery And Hardware Stores</Text>
         <Text style={styles.shopSub}>Mobile Counter POS & Billing</Text>
         <Text style={styles.fyText}>FY: 2026-2027 (Zero GST)</Text>
       </View>

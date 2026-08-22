@@ -6,7 +6,7 @@ export default function SettingsPage() {
   const company = useAppStore((s) => s.company);
   const setCompany = useAppStore((s) => s.setCompany);
 
-  const [name, setName] = useState(company?.name || 'Agre General Store');
+  const [name, setName] = useState(company?.name || 'Agre Machinery And Hardware Stores');
   const [address, setAddress] = useState(company?.address || '123 Market Yard');
   const [city, setCity] = useState(company?.city || 'Pune');
   const [state, setState] = useState(company?.state || 'Maharashtra');
