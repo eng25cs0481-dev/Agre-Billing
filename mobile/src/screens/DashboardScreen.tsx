@@ -22,7 +22,7 @@ export const DashboardScreen: React.FC<DashboardProps> = ({ onNavigate }) => {
     <ScrollView style={styles.container}>
       {/* Header */}
       <View style={styles.header}>
-        <Text style={styles.shopName}>AGRE BILLING</Text>
+        <Text style={styles.shopName}>AGRE MACHINERY & HARDWARE</Text>
         <Text style={styles.dateText}>{new Date().toLocaleDateString('en-IN', { weekday: 'short', day: 'numeric', month: 'short' })}</Text>
       </View>
 

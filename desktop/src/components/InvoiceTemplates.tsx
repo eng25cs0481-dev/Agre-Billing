@@ -23,10 +23,10 @@ export const A4Invoice: React.FC<InvoiceProps> = ({ voucher, company }) => {
       {/* Header */}
       <div style={{ display: 'flex', justifyContent: 'space-between', borderBottom: '2px solid #1a237e', paddingBottom: '16px', marginBottom: '20px' }}>
         <div>
-          <h1 style={{ margin: 0, fontSize: '24px', color: '#1a237e', fontWeight: 800 }}>
-            {company.name || 'AGRE GENERAL STORE'}
+          <h1 style={{ margin: 0, fontSize: '22px', color: '#1a237e', fontWeight: 800, textTransform: 'uppercase' }}>
+            {company.name || 'AGRE MACHINERY AND HARDWARE STORES'}
           </h1>
-          <div>{company.address || 'Market Yard, Main Road'}</div>
+          <div>{company.address || 'Main Market Road'}</div>
           <div>{company.city || 'Pune'}, {company.state || 'Maharashtra'}</div>
           <div>Phone: {company.phone || '9822001122'}</div>
         </div>
@@ -49,7 +49,7 @@ export const A4Invoice: React.FC<InvoiceProps> = ({ voucher, company }) => {
         <thead>
           <tr style={{ background: '#1a237e', color: 'white', textAlign: 'left' }}>
             <th style={{ padding: '8px', width: '40px' }}>#</th>
-            <th style={{ padding: '8px' }}>Product Description</th>
+            <th style={{ padding: '8px' }}>Item / Description</th>
             <th style={{ padding: '8px', textAlign: 'right', width: '80px' }}>Qty</th>
             <th style={{ padding: '8px', textAlign: 'right', width: '100px' }}>Rate (₹)</th>
             <th style={{ padding: '8px', textAlign: 'right', width: '90px' }}>Disc (₹)</th>
@@ -58,8 +58,8 @@ export const A4Invoice: React.FC<InvoiceProps> = ({ voucher, company }) => {
         </thead>
         <tbody>
           {(voucher.items || [
-            { product_name: 'Basmati Rice 5kg', quantity: 5, rate: 120, discount_amount: 0, amount: 600 },
-            { product_name: 'Sunflower Oil 1L', quantity: 2, rate: 250, discount_amount: 0, amount: 500 },
+            { product_name: 'Water Pump 1HP', quantity: 1, rate: 4500, discount_amount: 0, amount: 4500 },
+            { product_name: 'PVC Pipe 1 inch (20ft)', quantity: 4, rate: 250, discount_amount: 0, amount: 1000 },
           ]).map((item, idx) => (
             <tr key={idx} style={{ borderBottom: '1px solid #ddd' }}>
               <td style={{ padding: '8px' }}>{idx + 1}</td>
@@ -78,24 +78,24 @@ export const A4Invoice: React.FC<InvoiceProps> = ({ voucher, company }) => {
         <div style={{ width: '280px' }}>
           <div style={{ display: 'flex', justifyContent: 'space-between', padding: '4px 0' }}>
             <span>Subtotal:</span>
-            <span>{formatCurrency(voucher.subtotal || 1100)}</span>
+            <span>{formatCurrency(voucher.subtotal || 5500)}</span>
           </div>
           {Number(voucher.discount_amount) > 0 && (
             <div style={{ display: 'flex', justifyContent: 'space-between', padding: '4px 0', color: '#d32f2f' }}>
               <span>Discount:</span>
-              <span>−{formatCurrency(voucher.discount_amount || 100)}</span>
+              <span>−{formatCurrency(voucher.discount_amount || 0)}</span>
             </div>
           )}
           <div style={{ display: 'flex', justifyContent: 'space-between', padding: '8px 0', borderTop: '2px solid #111', fontSize: '16px', fontWeight: 800 }}>
             <span>Total Payable:</span>
-            <span>{formatCurrency(voucher.total_amount || 1000)}</span>
+            <span>{formatCurrency(voucher.total_amount || 5500)}</span>
           </div>
         </div>
       </div>
 
       {/* Footer */}
       <div style={{ borderTop: '1px solid #ddd', paddingTop: '16px', textAlign: 'center', fontSize: '11px', color: '#666' }}>
-        Thank you for your business! | Agre Billing System
+        Thank you for your business! | Agre Machinery And Hardware Stores
       </div>
     </div>
   );
@@ -112,8 +112,8 @@ export const ThermalReceipt: React.FC<InvoiceProps> = ({ voucher, company }) => 
       background: 'white',
       color: '#000',
     }}>
-      <div style={{ textAlign: 'center', fontWeight: 'bold', fontSize: '13px' }}>
-        {company.name || 'AGRE GENERAL STORE'}
+      <div style={{ textAlign: 'center', fontWeight: 'bold', fontSize: '12px', textTransform: 'uppercase' }}>
+        {company.name || 'AGRE MACHINERY AND HARDWARE STORES'}
       </div>
       <div style={{ textAlign: 'center', fontSize: '9px', marginBottom: '6px' }}>
         {company.phone ? `Ph: ${company.phone}` : ''}
@@ -128,8 +128,8 @@ export const ThermalReceipt: React.FC<InvoiceProps> = ({ voucher, company }) => 
       <table style={{ width: '100%', fontSize: '10px' }}>
         <tbody>
           {(voucher.items || [
-            { product_name: 'Rice 5kg', quantity: 5, rate: 120, amount: 600 },
-            { product_name: 'Oil 1L', quantity: 2, rate: 250, amount: 500 },
+            { product_name: 'Water Pump 1HP', quantity: 1, rate: 4500, amount: 4500 },
+            { product_name: 'PVC Pipe 1 inch', quantity: 4, rate: 250, amount: 1000 },
           ]).map((item, idx) => (
             <tr key={idx}>
               <td>{item.product_name}</td>
@@ -143,11 +143,11 @@ export const ThermalReceipt: React.FC<InvoiceProps> = ({ voucher, company }) => 
       <div style={{ borderTop: '1px dashed #000', marginTop: '6px', paddingTop: '4px' }}>
         <div style={{ display: 'flex', justifyContent: 'space-between', fontWeight: 'bold', fontSize: '12px' }}>
           <span>TOTAL:</span>
-          <span>{formatCurrency(voucher.total_amount || 1000)}</span>
+          <span>{formatCurrency(voucher.total_amount || 5500)}</span>
         </div>
       </div>
       <div style={{ textAlign: 'center', marginTop: '8px', fontSize: '9px' }}>
-        *** THANK YOU ***
+        *** THANK YOU FOR VISITING ***
       </div>
     </div>
   );
