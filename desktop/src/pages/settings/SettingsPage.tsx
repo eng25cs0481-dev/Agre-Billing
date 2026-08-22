@@ -1,13 +1,15 @@
-import React, { useState } from 'react';
-import { Save, RefreshCw, Download, CheckCircle } from 'lucide-react';
+import React, { useState, useEffect } from 'react';
+import { Save, RefreshCw, CheckCircle } from 'lucide-react';
 import { useAppStore } from '../../stores/appStore';
+import { useKeyboardShortcuts } from '../../hooks/useKeyboardShortcuts';
+import { supabase, isSupabaseConfigured } from '../../lib/supabase';
 
 export default function SettingsPage() {
   const company = useAppStore((s) => s.company);
   const setCompany = useAppStore((s) => s.setCompany);
 
   const [name, setName] = useState(company?.name || 'Agre Machinery And Hardware Stores');
-  const [address, setAddress] = useState(company?.address || '123 Market Yard');
+  const [address, setAddress] = useState(company?.address || 'Main Market Road');
   const [city, setCity] = useState(company?.city || 'Pune');
   const [state, setState] = useState(company?.state || 'Maharashtra');
   const [phone, setPhone] = useState(company?.phone || '9822001122');
@@ -15,29 +17,71 @@ export default function SettingsPage() {
   const [currencySymbol, setCurrencySymbol] = useState(company?.currency_symbol || '₹');
   const [saved, setSaved] = useState(false);
 
+  // Sync inputs with company store when store loads
+  useEffect(() => {
+    if (company) {
+      setName(company.name);
+      setAddress(company.address || '');
+      setCity(company.city || '');
+      setState(company.state || '');
+      setPhone(company.phone || '');
+      setEmail(company.email || '');
+      setCurrencySymbol(company.currency_symbol || '₹');
+    }
+  }, [company]);
+
   // App Updates State
   const [checkingUpdate, setCheckingUpdate] = useState(false);
   const [updateStatus, setUpdateStatus] = useState<string | null>(null);
 
-  const handleSave = () => {
-    setCompany({
-      id: company?.id || 'demo-company',
-      name,
-      address,
-      city,
-      state,
-      phone,
-      email,
+  const handleSave = async () => {
+    const updatedCompany = {
+      id: company?.id || 'main-company',
+      name: name.trim() || 'Agre Machinery And Hardware Stores',
+      address: address.trim(),
+      city: city.trim(),
+      state: state.trim(),
+      phone: phone.trim(),
+      email: email.trim(),
       currency_code: 'INR',
-      currency_symbol: currencySymbol,
+      currency_symbol: currencySymbol.trim() || '₹',
       decimal_places: 2,
       books_beginning_date: '2026-04-01',
-      created_at: new Date().toISOString(),
+      created_at: company?.created_at || new Date().toISOString(),
       updated_at: new Date().toISOString(),
-    });
+    };
+
+    // 1. Save to persisted store (localStorage)
+    setCompany(updatedCompany);
+
+    // 2. Sync to Supabase if connected
+    if (isSupabaseConfigured()) {
+      try {
+        await supabase.from('companies').upsert([
+          {
+            name: updatedCompany.name,
+            address: updatedCompany.address,
+            city: updatedCompany.city,
+            state: updatedCompany.state,
+            phone: updatedCompany.phone,
+            email: updatedCompany.email,
+            currency_symbol: updatedCompany.currency_symbol,
+            updated_at: new Date().toISOString(),
+          },
+        ]);
+      } catch (e) {
+        console.warn('Could not sync company to cloud:', e);
+      }
+    }
+
     setSaved(true);
     setTimeout(() => setSaved(false), 2500);
   };
+
+  useKeyboardShortcuts([
+    { key: 'a', ctrl: true, action: handleSave, description: 'Save' },
+    { key: 's', ctrl: true, action: handleSave, description: 'Save' },
+  ]);
 
   const checkForUpdates = async () => {
     setCheckingUpdate(true);
@@ -62,7 +106,7 @@ export default function SettingsPage() {
     <div style={{ maxWidth: 750, margin: '0 auto', overflowY: 'auto', height: '100%', paddingBottom: 40 }}>
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 12 }}>
         <h1 style={{ fontSize: 14, fontWeight: 'bold', color: '#0c3c78' }}>Company & System Settings</h1>
-        {saved && <span style={{ color: '#15803d', fontWeight: 'bold', fontSize: 12 }}>✓ Settings Saved</span>}
+        {saved && <span style={{ color: '#15803d', fontWeight: 'bold', fontSize: 12 }}>✓ Company Info Saved Successfully</span>}
       </div>
 
       {/* Company Profile Card */}
@@ -74,7 +118,7 @@ export default function SettingsPage() {
         <div style={{ marginBottom: 10, display: 'flex', alignItems: 'center' }}>
           <span style={{ width: 150, fontWeight: 600 }}>Shop / Company Name</span>
           <span style={{ marginRight: 8 }}>:</span>
-          <input type="text" className="tp-party-input" style={{ flex: 1 }} value={name} onChange={(e) => setName(e.target.value)} />
+          <input type="text" className="tp-party-input" style={{ flex: 1, fontWeight: 'bold' }} value={name} onChange={(e) => setName(e.target.value)} />
         </div>
 
         <div style={{ marginBottom: 10, display: 'flex', alignItems: 'center' }}>

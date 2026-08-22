@@ -1,9 +1,10 @@
 import { create } from 'zustand';
+import { persist } from 'zustand/middleware';
 import type { Company, FinancialYear } from '@agre/shared/types';
 
 interface AppState {
   // Company
-  company: Company | null;
+  company: Company;
   financialYear: FinancialYear | null;
 
   // Navigation
@@ -11,7 +12,7 @@ interface AppState {
   sidebarCollapsed: boolean;
 
   // Actions
-  setCompany: (company: Company | null) => void;
+  setCompany: (company: Company) => void;
   setFinancialYear: (fy: FinancialYear | null) => void;
   setCurrentDate: (date: string) => void;
   toggleSidebar: () => void;
@@ -33,14 +34,21 @@ const DEFAULT_COMPANY: Company = {
   updated_at: new Date().toISOString(),
 };
 
-export const useAppStore = create<AppState>((set) => ({
-  company: DEFAULT_COMPANY,
-  financialYear: null,
-  currentDate: new Date().toISOString().split('T')[0],
-  sidebarCollapsed: false,
+export const useAppStore = create<AppState>()(
+  persist(
+    (set) => ({
+      company: DEFAULT_COMPANY,
+      financialYear: null,
+      currentDate: new Date().toISOString().split('T')[0],
+      sidebarCollapsed: false,
 
-  setCompany: (company) => set({ company }),
-  setFinancialYear: (financialYear) => set({ financialYear }),
-  setCurrentDate: (currentDate) => set({ currentDate }),
-  toggleSidebar: () => set((s) => ({ sidebarCollapsed: !s.sidebarCollapsed })),
-}));
+      setCompany: (company) => set({ company }),
+      setFinancialYear: (financialYear) => set({ financialYear }),
+      setCurrentDate: (currentDate) => set({ currentDate }),
+      toggleSidebar: () => set((s) => ({ sidebarCollapsed: !s.sidebarCollapsed })),
+    }),
+    {
+      name: 'agre-billing-app-store',
+    }
+  )
+);
