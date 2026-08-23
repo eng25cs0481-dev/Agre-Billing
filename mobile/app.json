@@ -5,9 +5,11 @@
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
-    "userInterfaceStyle": "dark",
+    "userInterfaceStyle": "light",
     "splash": {
-      "backgroundColor": "#0a0e27"
+      "image": "./assets/splash.png",
+      "resizeMode": "contain",
+      "backgroundColor": "#0c3c78"
     },
     "ios": {
       "supportsTablet": true,
@@ -15,9 +17,13 @@
     },
     "android": {
       "adaptiveIcon": {
-        "backgroundColor": "#0a0e27"
+        "foregroundImage": "./assets/adaptive-icon.png",
+        "backgroundColor": "#0c3c78"
       },
       "package": "com.agre.billing"
+    },
+    "web": {
+      "favicon": "./assets/favicon.png"
     },
     "plugins": [
       "expo-asset",
