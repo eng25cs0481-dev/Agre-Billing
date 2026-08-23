@@ -7,7 +7,7 @@ import {
   ScrollView,
   TouchableOpacity,
 } from 'react-native';
-import { formatCurrency } from '@agre/shared/utils/currency';
+import { formatCurrency } from '@agre/shared';
 
 interface ProductItem {
   id: string;

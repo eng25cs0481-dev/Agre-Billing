@@ -8,9 +8,8 @@ import {
   TextInput,
   Alert,
 } from 'react-native';
-import { formatCurrency } from '@agre/shared/utils/currency';
-import { calculateBillTotals } from '@agre/shared/calculations/billing';
-import type { VoucherItemInput, PaymentMode } from '@agre/shared/types';
+import { formatCurrency, calculateBillTotals } from '@agre/shared';
+import type { VoucherItemInput, PaymentMode } from '@agre/shared';
 
 interface QuickSaleProps {
   onBack: () => void;

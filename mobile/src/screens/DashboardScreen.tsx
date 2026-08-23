@@ -7,7 +7,7 @@ import {
   ScrollView,
   Alert,
 } from 'react-native';
-import { formatCurrency } from '@agre/shared/utils/currency';
+import { formatCurrency } from '@agre/shared';
 
 interface DashboardProps {
   onNavigate: (screen: string) => void;

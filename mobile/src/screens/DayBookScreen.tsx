@@ -7,7 +7,7 @@ import {
   TouchableOpacity,
   Alert,
 } from 'react-native';
-import { formatCurrency } from '@agre/shared/utils/currency';
+import { formatCurrency } from '@agre/shared';
 
 interface DayBookItem {
   id: string;
