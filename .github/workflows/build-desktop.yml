@@ -47,6 +47,8 @@ jobs:
         uses: tauri-apps/tauri-action@v0
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          VITE_SUPABASE_URL: 'https://odhvrjmateakyrgjpdyp.supabase.co'
+          VITE_SUPABASE_ANON_KEY: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im9kaHZyam1hdGVha3lyZ2pwZHlwIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODcxNTg4MDIsImV4cCI6MjEwMjczNDgwMn0.F2MWCpSo9ZnNpdA_t7YdHy0oj09WtRKgv9Ysf9ogFEI'
         with:
           projectPath: './desktop'
           tagName: agre-billing-v__VERSION__

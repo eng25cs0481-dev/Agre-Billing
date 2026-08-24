@@ -1,5 +1,5 @@
 import React from 'react';
-import { BrowserRouter, Routes, Route } from 'react-router-dom';
+import { HashRouter, Routes, Route } from 'react-router-dom';
 import AppLayout from './layouts/AppLayout';
 import Gateway from './pages/Gateway';
 import PlaceholderPage from './pages/PlaceholderPage';
@@ -36,7 +36,7 @@ import './index.css';
 
 export default function App() {
   return (
-    <BrowserRouter>
+    <HashRouter>
       <Routes>
         <Route element={<AppLayout />}>
           {/* Gateway */}
@@ -92,6 +92,6 @@ export default function App() {
           <Route path="*" element={<PlaceholderPage title="Page Not Found" />} />
         </Route>
       </Routes>
-    </BrowserRouter>
+    </HashRouter>
   );
 }
