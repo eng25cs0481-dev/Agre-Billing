@@ -117,42 +117,47 @@ export default function SaleVoucherPage() {
   return (
     <div className="tp-voucher-frame">
       {/* Top Voucher Info */}
-      <div className="tp-voucher-top-info">
-        <div style={{ display: 'flex', alignItems: 'center' }}>
-          <span className="tp-voucher-badge">Sales</span>
-          <span style={{ marginRight: 6, fontWeight: 'bold' }}>No.</span>
-          <input
-            type="text"
-            className="tp-voucher-no-input"
-            value={voucherNo}
-            onChange={(e) => setVoucherNo(e.target.value)}
-            style={{ width: 130 }}
-          />
+      <div className="tp-voucher-top-info" style={{ padding: '0 8px' }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 16 }}>
+          <span style={{ fontWeight: 'bold', fontSize: 13, color: '#093970', textTransform: 'uppercase' }}>Sales</span>
+          <div>
+            <span style={{ fontWeight: 'bold', fontSize: 12, color: '#093970' }}>No.</span>
+            <input
+              type="text"
+              className="tp-voucher-no-input"
+              value={voucherNo}
+              onChange={(e) => setVoucherNo(e.target.value)}
+              style={{ width: 130, marginLeft: 6 }}
+            />
+          </div>
         </div>
-        <div>
-          {saved && <span style={{ color: '#15803d', fontWeight: 'bold', marginRight: 12 }}>✓ Saved Successfully</span>}
-          <span style={{ fontWeight: 600 }}>{formatDateLong(new Date().toISOString())}</span>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
+          {saved && <span style={{ color: '#15803d', fontWeight: 'bold' }}>✓ Saved Successfully</span>}
+          <span style={{ fontWeight: 600, fontSize: 12 }}>{formatDateLong(new Date().toISOString())}</span>
         </div>
       </div>
 
       {/* Party Details */}
-      <div className="tp-voucher-party-row" style={{ marginTop: 8 }}>
+      <div className="tp-voucher-party-row" style={{ marginTop: 8, padding: '0 8px' }}>
         <span className="tp-party-label">Party A/c name</span>
-        <span style={{ marginRight: 6 }}>:</span>
-        <Autocomplete
-          className="tp-party-input"
-          value={partyName}
-          onChange={setPartyName}
-          onSelect={selectCustomer}
-          options={customerOptions}
-          placeholder="Select customer or Walk-in"
-        />
+        <span className="tp-colon">:</span>
+        <div style={{ flex: 1, maxWidth: 400 }}>
+          <Autocomplete
+            className="tp-party-input"
+            style={{ width: '100%' }}
+            value={partyName}
+            onChange={setPartyName}
+            onSelect={selectCustomer}
+            options={customerOptions}
+            placeholder="Select customer or Walk-in"
+          />
+        </div>
         <span className="tp-party-balance">Current balance : {partyBalance}</span>
       </div>
 
-      <div className="tp-voucher-party-row">
+      <div className="tp-voucher-party-row" style={{ padding: '0 8px' }}>
         <span className="tp-party-label">Payment Mode</span>
-        <span style={{ marginRight: 6 }}>:</span>
+        <span className="tp-colon">:</span>
         <select
           className="tp-party-input"
           value={paymentMode}
@@ -167,78 +172,74 @@ export default function SaleVoucherPage() {
       </div>
 
       {/* Items Table */}
-      <div className="tp-table-wrap">
-        <table className="tp-table">
-          <thead>
-            <tr>
-              <th style={{ width: '45%' }}>Name of Item</th>
-              <th style={{ width: '12%' }} className="num">Quantity</th>
-              <th style={{ width: '14%' }} className="num">Rate</th>
-              <th style={{ width: '8%' }}>per</th>
-              <th style={{ width: '9%' }} className="num">Disc %</th>
-              <th style={{ width: '12%' }} className="num">Amount (₹)</th>
-            </tr>
-          </thead>
-          <tbody>
-            {items.map((item, index) => {
-              const result = totals.itemResults[validItems.findIndex((vi) =>
-                vi.product_name === item.product_name && vi.quantity === item.quantity && vi.rate === item.rate
-              )];
-              const lineAmount = result?.amount ?? (item.quantity && item.rate ? item.quantity * item.rate : 0);
+      <div className="tp-voucher-grid" style={{ flex: 1, minHeight: 220 }}>
+        <div className="tp-grid-header">
+          <div style={{ flex: 1, paddingLeft: 8 }}>Name of Item</div>
+          <div style={{ width: 90, textAlign: 'right' }}>Quantity</div>
+          <div style={{ width: 110, textAlign: 'right' }}>Rate</div>
+          <div style={{ width: 60, textAlign: 'center' }}>per</div>
+          <div style={{ width: 80, textAlign: 'right' }}>Disc %</div>
+          <div style={{ width: 120, textAlign: 'right', paddingRight: 8 }}>Amount</div>
+        </div>
+        <div style={{ overflowY: 'auto', flex: 1 }}>
+          {items.map((item, index) => {
+            const result = totals.itemResults[validItems.findIndex((vi) =>
+              vi.product_name === item.product_name && vi.quantity === item.quantity && vi.rate === item.rate
+            )];
+            const lineAmount = result?.amount ?? (item.quantity && item.rate ? item.quantity * item.rate : 0);
 
-              return (
-                <tr key={item._key} className={index === items.length - 1 ? 'selected' : ''}>
-                  <td>
-                    <Autocomplete
-                      inputRef={index === items.length - 1 ? itemRef : undefined}
-                      style={{
-                        width: '100%',
-                        border: 'none',
-                        background: 'transparent',
-                        fontWeight: item.product_name ? 600 : 'normal',
-                        outline: 'none',
-                      }}
-                      placeholder="Type item name..."
-                      value={item.product_name}
-                      options={productOptions}
-                      onChange={(v) => updateItem(item._key, 'product_name', v)}
-                      onSelect={(opt) => selectProduct(item._key, opt)}
-                      onEnter={addItem}
-                    />
-                  </td>
-                  <td className="num">
-                    <input
-                      type="number"
-                      style={{ width: '70px', textAlign: 'right', border: 'none', background: 'transparent', outline: 'none' }}
-                      value={item.quantity || ''}
-                      onChange={(e) => updateItem(item._key, 'quantity', parseFloat(e.target.value) || 0)}
-                    />
-                  </td>
-                  <td className="num">
-                    <input
-                      type="number"
-                      style={{ width: '80px', textAlign: 'right', border: 'none', background: 'transparent', outline: 'none' }}
-                      value={item.rate || ''}
-                      onChange={(e) => updateItem(item._key, 'rate', parseFloat(e.target.value) || 0)}
-                    />
-                  </td>
-                  <td>{item.unit || 'pcs'}</td>
-                  <td className="num">
-                    <input
-                      type="number"
-                      style={{ width: '50px', textAlign: 'right', border: 'none', background: 'transparent', outline: 'none' }}
-                      value={item.discount_percent || ''}
-                      onChange={(e) => updateItem(item._key, 'discount_percent', parseFloat(e.target.value) || 0)}
-                    />
-                  </td>
-                  <td className="num" style={{ fontWeight: 700, fontFamily: 'var(--font-mono)' }}>
-                    {lineAmount > 0 ? lineAmount.toFixed(2) : ''}
-                  </td>
-                </tr>
-              );
-            })}
-          </tbody>
-        </table>
+            return (
+              <div key={item._key} className="tp-grid-row">
+                <div style={{ flex: 1, paddingRight: 8 }}>
+                  <Autocomplete
+                    inputRef={index === items.length - 1 ? itemRef : undefined}
+                    className="tp-grid-input"
+                    style={{ width: '100%', fontWeight: item.product_name ? 600 : 'normal' }}
+                    placeholder="Type item name..."
+                    value={item.product_name}
+                    options={productOptions}
+                    onChange={(v) => updateItem(item._key, 'product_name', v)}
+                    onSelect={(opt) => selectProduct(item._key, opt)}
+                    onEnter={addItem}
+                  />
+                </div>
+                <div style={{ width: 90, textAlign: 'right' }}>
+                  <input
+                    type="number"
+                    className="tp-grid-input"
+                    style={{ textAlign: 'right', width: '100%' }}
+                    value={item.quantity || ''}
+                    onChange={(e) => updateItem(item._key, 'quantity', parseFloat(e.target.value) || 0)}
+                  />
+                </div>
+                <div style={{ width: 110, textAlign: 'right' }}>
+                  <input
+                    type="number"
+                    className="tp-grid-input"
+                    style={{ textAlign: 'right', width: '100%' }}
+                    value={item.rate || ''}
+                    onChange={(e) => updateItem(item._key, 'rate', parseFloat(e.target.value) || 0)}
+                  />
+                </div>
+                <div style={{ width: 60, textAlign: 'center', fontSize: 11, fontWeight: 600 }}>
+                  {item.unit || 'pcs'}
+                </div>
+                <div style={{ width: 80, textAlign: 'right' }}>
+                  <input
+                    type="number"
+                    className="tp-grid-input"
+                    style={{ textAlign: 'right', width: '100%' }}
+                    value={item.discount_percent || ''}
+                    onChange={(e) => updateItem(item._key, 'discount_percent', parseFloat(e.target.value) || 0)}
+                  />
+                </div>
+                <div style={{ width: 120, textAlign: 'right', paddingRight: 8, fontWeight: 700, fontFamily: 'var(--font-mono)' }}>
+                  {lineAmount > 0 ? lineAmount.toFixed(2) : ''}
+                </div>
+              </div>
+            );
+          })}
+        </div>
       </div>
 
       {/* Narration & Voucher Totals */}
@@ -258,10 +259,10 @@ export default function SaleVoucherPage() {
               onClick={handleSave}
               style={{ marginRight: 6 }}
             >
-              Accept (^A)
+              Accept (Ctrl+A)
             </button>
             <button className="tp-btn" onClick={() => setShowPrintModal(true)}>
-              Print (^P)
+              Print (Ctrl+P)
             </button>
             <button className="tp-btn" onClick={addItem} style={{ marginLeft: 6 }}>
               + Add Line
@@ -350,7 +351,7 @@ export default function SaleVoucherPage() {
         <div className="tp-modal-overlay" onClick={() => setShowPreview(false)}>
           <div style={{ background: '#ffffff', width: '850px', maxHeight: '90vh', overflow: 'auto', padding: 20, boxShadow: '0 8px 30px rgba(0,0,0,0.5)' }} onClick={(e) => e.stopPropagation()}>
             <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 12 }}>
-              <button className="tp-btn primary" onClick={() => window.print()}>Print Invoice (^P)</button>
+              <button className="tp-btn primary" onClick={() => window.print()}>Print Invoice (Ctrl+P)</button>
               <button className="tp-btn" onClick={() => setShowPreview(false)}>Close Preview (Esc)</button>
             </div>
             <A4Invoice

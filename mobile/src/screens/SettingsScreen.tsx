@@ -4,7 +4,7 @@ import { View, Text, StyleSheet, TouchableOpacity, ScrollView, Alert, ActivityIn
 const CURRENT_VERSION = 'v1.0.0';
 const GITHUB_REPO = 'eng25cs0481-dev/Agre-Billing';
 
-export default function SettingsScreen() {
+export function SettingsScreen() {
   const [checking, setChecking] = useState(false);
   const [latestRelease, setLatestRelease] = useState<{ tag: string; body?: string; downloadUrl?: string } | null>(null);
 

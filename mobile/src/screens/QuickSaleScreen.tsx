@@ -13,11 +13,12 @@ import type { VoucherItemInput, PaymentMode } from '@agre/shared';
 
 interface QuickSaleProps {
   onBack: () => void;
+  voucherType?: 'retail' | 'wholesale' | 'purchase' | null;
 }
 
 const AVAILABLE_PRODUCTS: Array<{ id: string; name: string; rate: number; stock: number; unit: string }> = [];
 
-export const QuickSaleScreen: React.FC<QuickSaleProps> = ({ onBack }) => {
+export const QuickSaleScreen: React.FC<QuickSaleProps> = ({ onBack, voucherType }) => {
   const [customerName, setCustomerName] = useState('Walk-in Customer');
   const [paymentMode, setPaymentMode] = useState<PaymentMode>('cash');
   const [cart, setCart] = useState<VoucherItemInput[]>([]);
@@ -48,8 +49,8 @@ export const QuickSaleScreen: React.FC<QuickSaleProps> = ({ onBack }) => {
       return;
     }
     Alert.alert(
-      'Sale Confirmed',
-      `Bill Total: ${formatCurrency(totals.grandTotal)}\nPayment: ${paymentMode.toUpperCase()}\nCustomer: ${customerName}`,
+      `${voucherType === 'purchase' ? 'Purchase' : 'Sale'} Confirmed`,
+      `Total: ${formatCurrency(totals.grandTotal)}\nPayment: ${paymentMode.toUpperCase()}\nParty: ${customerName}`,
       [{ text: 'OK', onPress: onBack }]
     );
   };
@@ -65,7 +66,9 @@ export const QuickSaleScreen: React.FC<QuickSaleProps> = ({ onBack }) => {
         <TouchableOpacity onPress={onBack}>
           <Text style={styles.backBtn}>← Back</Text>
         </TouchableOpacity>
-        <Text style={styles.title}>New Sale (Mobile POS)</Text>
+        <Text style={styles.title}>
+          {voucherType === 'wholesale' ? 'Wholesale Sale' : voucherType === 'purchase' ? 'Purchase Entry' : 'Retail Sale'}
+        </Text>
         <TouchableOpacity onPress={() => setCart([])}>
           <Text style={styles.clearBtn}>Clear</Text>
         </TouchableOpacity>
@@ -77,7 +80,7 @@ export const QuickSaleScreen: React.FC<QuickSaleProps> = ({ onBack }) => {
           style={styles.customerInput}
           value={customerName}
           onChangeText={setCustomerName}
-          placeholder="Customer Name"
+          placeholder={voucherType === 'purchase' ? "Supplier Name" : "Customer Name"}
           placeholderTextColor="#5c6bc0"
         />
         <View style={styles.modeSelector}>
@@ -150,7 +153,9 @@ export const QuickSaleScreen: React.FC<QuickSaleProps> = ({ onBack }) => {
           <Text style={styles.totalValue}>{formatCurrency(totals.grandTotal)}</Text>
         </View>
         <TouchableOpacity style={styles.checkoutBtn} onPress={handleCheckout}>
-          <Text style={styles.checkoutText}>CONFIRM & BILL (₹{totals.grandTotal})</Text>
+          <Text style={styles.checkoutText}>
+            {voucherType === 'purchase' ? 'RECORD PURCHASE' : 'CONFIRM & BILL'} (₹{totals.grandTotal})
+          </Text>
         </TouchableOpacity>
       </View>
     </View>

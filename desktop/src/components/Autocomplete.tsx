@@ -156,13 +156,20 @@ export default function Autocomplete({
         aria-autocomplete="list"
         autoComplete="off"
         onChange={(e) => {
-          onChange(e.target.value);
-          if (!open) openMenu();
-          else updateRect();
+          const val = e.target.value;
+          onChange(val);
+          if (val.trim().length > 0) {
+            if (!open) openMenu();
+            else updateRect();
+          } else {
+            setOpen(false);
+          }
         }}
-        onFocus={openMenu}
+        onFocus={() => {
+          if (value.trim().length > 0) openMenu();
+        }}
         onClick={() => {
-          if (!open) openMenu();
+          if (!open && value.trim().length > 0) openMenu();
         }}
         onBlur={() => {
           // Delay so an option's onMouseDown selection registers before closing.

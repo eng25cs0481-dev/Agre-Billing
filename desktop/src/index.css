@@ -11,13 +11,14 @@
   --tp-sub-text: #05264c;
   
   /* Work Area Colors */
-  --tp-bg-work: #edf7ee;           /* TallyPrime Pale Mint/Sage voucher work area */
+  --tp-bg-work: #f1f7f2;           /* TallyPrime Pale Mint/Sage voucher work area */
   --tp-bg-card: #ffffff;
-  --tp-table-header-bg: #e4f2e6;
+  --tp-table-header-bg: #e4f2e8;
+  --tp-table-border: #9ec1b0;
   --tp-row-stripe: #f7fcf7;
-  --tp-active-yellow: #fff9c4;     /* Yellow focused active input */
+  --tp-active-yellow: #fff2cc;     /* Yellow focused active input */
   --tp-active-border: #f59e0b;
-  --tp-selected-row: #ffb703;      /* Golden amber row selection highlight */
+  --tp-selected-row: #ffa100;      /* Orange row selection highlight */
   --tp-selected-text: #000000;
   
   /* Right Sidebar (F-Key Action Bar) */
@@ -395,6 +396,10 @@ html, body {
   color: #374151;
   font-weight: 600;
 }
+.tp-colon {
+  margin: 0 8px;
+  font-weight: bold;
+}
 .tp-party-input {
   flex: 1;
   max-width: 400px;
@@ -419,8 +424,8 @@ html, body {
 .tp-table-wrap {
   flex: 1;
   overflow: auto;
-  border-top: 1px solid #5a9ec9;
-  border-bottom: 1px solid #5a9ec9;
+  border-top: 1px solid var(--tp-table-border);
+  border-bottom: 1px solid var(--tp-table-border);
   background: #ffffff;
   margin: 6px 0;
 }
@@ -433,8 +438,8 @@ html, body {
   background: var(--tp-table-header-bg);
   color: #05264c;
   font-weight: 700;
-  border-bottom: 1px solid #99c2a2;
-  border-right: 1px solid #c2dec8;
+  border-bottom: 1px solid var(--tp-table-border);
+  border-right: 1px solid var(--tp-table-border);
   padding: 4px 6px;
   text-align: left;
 }
@@ -450,11 +455,80 @@ html, body {
 }
 .tp-table tr.selected {
   background: var(--tp-selected-row) !important;
-  color: #000000 !important;
+  color: var(--tp-selected-text) !important;
   font-weight: 600;
 }
 .tp-table tr:hover:not(.selected) {
   background: #f0f7f1;
+}
+
+/* Tally Voucher Grid Layout */
+.tp-voucher-grid {
+  border-top: 1px solid var(--tp-table-border);
+  border-bottom: 1px solid var(--tp-table-border);
+  background: #ffffff;
+  margin: 6px 0;
+  display: flex;
+  flex-direction: column;
+}
+.tp-grid-header {
+  display: flex;
+  background: var(--tp-table-header-bg);
+  border-bottom: 1px solid var(--tp-table-border);
+  font-weight: 700;
+  color: #05264c;
+  padding: 4px 0;
+  font-size: 11.5px;
+}
+.tp-grid-header > div {
+  border-right: 1px solid var(--tp-table-border);
+}
+.tp-grid-header > div:last-child {
+  border-right: none;
+}
+.tp-grid-row {
+  display: flex;
+  border-bottom: 1px solid #e5ede6;
+  background: #ffffff;
+  align-items: stretch;
+  transition: background 0.1s;
+}
+.tp-grid-row:hover:not(:focus-within) {
+  background: #f0f7f1;
+}
+.tp-grid-row:focus-within {
+  background: var(--tp-selected-row);
+  color: var(--tp-selected-text);
+  font-weight: 600;
+}
+.tp-grid-row > div {
+  border-right: 1px solid #e5ede6;
+  display: flex;
+  align-items: center;
+}
+.tp-grid-row > div:last-child {
+  border-right: none;
+}
+.tp-grid-input {
+  width: 100%;
+  background: transparent;
+  border: none;
+  outline: none;
+  padding: 2px 6px;
+  color: inherit;
+  font-family: inherit;
+  font-size: 11.5px;
+  height: 24px;
+}
+.tp-grid-row:focus-within .tp-grid-input::placeholder {
+  color: rgba(255, 255, 255, 0.7);
+}
+.tp-grid-input:focus {
+  background: var(--tp-active-yellow);
+  color: #000;
+  border: 1px solid var(--tp-active-border);
+  border-radius: 2px;
+  margin: -1px;
 }
 
 /* Voucher Total & Narration */

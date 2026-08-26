@@ -149,7 +149,7 @@ export default function PaymentVoucherPage() {
       {/* Summary and Bottom Bar */}
       <div className="tp-totals-section" style={{ borderTop: '2px solid #0c3c78' }}>
         <div style={{ flex: 1 }}>
-          <span style={{ fontSize: 11, color: '#64748b' }}>Shortcut: Press ^A or Ctrl+S to save</span>
+          <span style={{ fontSize: 11, color: '#64748b' }}>Shortcut: Press Ctrl+A to save</span>
         </div>
         <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
           <span style={{ fontSize: 13, fontWeight: 800, color: '#0c3c78' }}>TOTAL PAID:</span>
@@ -162,7 +162,7 @@ export default function PaymentVoucherPage() {
       <div className="tp-bottom-bar" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '6px 12px' }}>
         <div style={{ display: 'flex', gap: 8 }}>
           <button className="tp-btn primary" onClick={handleSave} disabled={!amount || amount <= 0}>
-            Save Payment (^A / Ctrl+S)
+            Save Payment (Ctrl+A)
           </button>
           <button className="tp-btn" onClick={() => window.print()}>
             <Printer size={12} style={{ marginRight: 4 }} /> Print Voucher

@@ -262,7 +262,7 @@ export default function CustomerFormPage() {
               Quit (Esc)
             </button>
             <button className="tp-btn primary" onClick={handleSave} disabled={saving}>
-              {saving ? 'Saving...' : isEditing ? 'Update (^A)' : 'Accept (^A)'}
+              {saving ? 'Saving...' : isEditing ? 'Update (Ctrl+A)' : 'Accept (Ctrl+A)'}
             </button>
           </div>
         </div>

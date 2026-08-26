@@ -106,7 +106,7 @@ export default function MasterListPage<T extends { id: string }>({
           />
           {onAdd && (
             <button className="tp-btn primary" onClick={onAdd}>
-              + {addLabel} (^C)
+              + {addLabel} (Ctrl+C)
             </button>
           )}
         </div>

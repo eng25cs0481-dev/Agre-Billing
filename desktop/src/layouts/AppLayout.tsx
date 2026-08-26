@@ -167,10 +167,10 @@ export default function AppLayout() {
           const saveBtn = document.querySelector('button[data-save="true"]') as HTMLButtonElement;
           saveBtn?.click();
         }}>
-          <kbd>^A</kbd>: Accept (Save)
+          <kbd>Ctrl+A</kbd>: Accept (Save)
         </button>
         <button className="tp-bottom-btn" onClick={() => window.print()}>
-          <kbd>^P</kbd>: Print
+          <kbd>Ctrl+P</kbd>: Print
         </button>
         <button className="tp-bottom-btn" onClick={() => navigate('/masters/products')}>
           <kbd>F8</kbd>: Sales

@@ -112,21 +112,23 @@ export default function PurchaseVoucherPage() {
   return (
     <div className="tp-voucher-frame">
       {/* Top Header & Voucher No */}
-      <div className="tp-voucher-top-info">
-        <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-          <span className="tp-voucher-badge" style={{ backgroundColor: '#0c3c78' }}>Purchase</span>
-          <span style={{ fontWeight: 'bold', fontSize: 13, color: '#0c3c78' }}>No.</span>
-          <input
-            type="text"
-            className="tp-voucher-no-input"
-            value={voucherNo}
-            onChange={(e) => setVoucherNo(e.target.value)}
-            style={{ width: 130 }}
-          />
+      <div className="tp-voucher-top-info" style={{ padding: '0 8px' }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 16 }}>
+          <span style={{ fontWeight: 'bold', fontSize: 13, color: '#093970', textTransform: 'uppercase' }}>Purchase</span>
+          <div>
+            <span style={{ fontWeight: 'bold', fontSize: 12, color: '#093970' }}>No.</span>
+            <input
+              type="text"
+              className="tp-voucher-no-input"
+              value={voucherNo}
+              onChange={(e) => setVoucherNo(e.target.value)}
+              style={{ width: 130, marginLeft: 6 }}
+            />
+          </div>
         </div>
         <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
           {saved && <span style={{ color: '#15803d', fontWeight: 'bold', fontSize: 12 }}>✓ Saved Successfully</span>}
-          <span style={{ fontWeight: 600, fontSize: 12, color: '#1e293b' }}>{formatDateLong(new Date().toISOString())}</span>
+          <span style={{ fontWeight: 600, fontSize: 12 }}>{formatDateLong(new Date().toISOString())}</span>
         </div>
       </div>
 
@@ -158,14 +160,14 @@ export default function PurchaseVoucherPage() {
       </div>
 
       {/* Supplier Party Details */}
-      <div className="tp-voucher-party-row" style={{ marginTop: 8 }}>
+      <div className="tp-voucher-party-row" style={{ marginTop: 8, padding: '0 8px' }}>
         <span className="tp-party-label">Party A/c name</span>
         <span className="tp-colon">:</span>
-        <div style={{ flex: 1 }}>
+        <div style={{ flex: 1, maxWidth: 400 }}>
           <Autocomplete
             inputRef={supplierInputRef}
             className="tp-party-input"
-            style={{ width: '100%', fontWeight: 'bold' }}
+            style={{ width: '100%' }}
             placeholder="Select Supplier or Sundry Creditor..."
             value={supplierName}
             options={supplierOptions}
@@ -182,7 +184,6 @@ export default function PurchaseVoucherPage() {
             className="tp-party-input"
             value={paymentMode}
             onChange={(e) => setPaymentMode(e.target.value as PaymentMode)}
-            style={{ fontWeight: 600 }}
           >
             <option value="credit">Credit</option>
             <option value="cash">Cash</option>
@@ -193,7 +194,7 @@ export default function PurchaseVoucherPage() {
       </div>
 
       {/* Purchase Ledger Row */}
-      <div className="tp-voucher-party-row">
+      <div className="tp-voucher-party-row" style={{ padding: '0 8px' }}>
         <span className="tp-party-label">Purchase ledger</span>
         <span className="tp-colon">:</span>
         <input
@@ -201,7 +202,7 @@ export default function PurchaseVoucherPage() {
           className="tp-party-input"
           readOnly
           value="Purchase Accounts"
-          style={{ width: 220, color: '#0c3c78', fontWeight: 600 }}
+          style={{ width: 220, color: '#093970', fontWeight: 600 }}
         />
       </div>
 
@@ -345,7 +346,7 @@ export default function PurchaseVoucherPage() {
       <div className="tp-bottom-bar" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '6px 12px' }}>
         <div style={{ display: 'flex', gap: 8 }}>
           <button className="tp-btn primary" onClick={handleSave} disabled={validItems.length === 0}>
-            Save Purchase (^A / Ctrl+S)
+            Save Purchase (Ctrl+A)
           </button>
           <button className="tp-btn" onClick={() => window.print()}>
             <Printer size={12} style={{ marginRight: 4 }} /> Print Voucher

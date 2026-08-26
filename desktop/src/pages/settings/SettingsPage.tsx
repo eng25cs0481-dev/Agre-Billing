@@ -168,7 +168,7 @@ export default function SettingsPage() {
 
         <div style={{ marginTop: 16, display: 'flex', justifyContent: 'flex-end' }}>
           <button className="tp-btn primary" onClick={handleSave}>
-            <Save size={13} style={{ marginRight: 4 }} /> Save Company Profile (^A)
+            <Save size={13} style={{ marginRight: 4 }} /> Save Company Profile (Ctrl+A)
           </button>
         </div>
       </div>
