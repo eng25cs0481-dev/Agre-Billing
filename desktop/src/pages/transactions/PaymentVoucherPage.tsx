@@ -1,13 +1,16 @@
-import React, { useState } from 'react';
+import React, { useState, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Save, Printer } from 'lucide-react';
 import { useKeyboardShortcuts } from '../../hooks/useKeyboardShortcuts';
 import { formatCurrency } from '@agre/shared/utils/currency';
 import type { PaymentMode } from '@agre/shared/types';
 import { PAYMENT_MODE_LABELS } from '@agre/shared/constants';
+import Autocomplete, { type AutocompleteOption } from '../../components/Autocomplete';
+import { useMasters } from '../../stores/mastersStore';
 
 export default function PaymentVoucherPage() {
   const navigate = useNavigate();
+  const { suppliers } = useMasters();
   const [date, setDate] = useState(new Date().toISOString().split('T')[0]);
   const [supplierName, setSupplierName] = useState('');
   const [amount, setAmount] = useState<number | ''>('');
@@ -15,6 +18,19 @@ export default function PaymentVoucherPage() {
   const [refNumber, setRefNumber] = useState('');
   const [narration, setNarration] = useState('');
   const [saved, setSaved] = useState(false);
+
+  const supplierOptions = useMemo<AutocompleteOption[]>(
+    () =>
+      suppliers.map((s) => ({
+        label: s.name,
+        sublabel: s.outstanding_balance
+          ? `Due ${formatCurrency(s.outstanding_balance, '')}`
+          : s.phone || '',
+        value: s.id,
+        data: s,
+      })),
+    [suppliers]
+  );
 
   const handleSave = () => {
     if (!amount || amount <= 0) return;
@@ -55,12 +71,13 @@ export default function PaymentVoucherPage() {
 
         <div className="form-group">
           <label className="form-label">Paid To (Supplier / Ledger)</label>
-          <input
-            type="text"
+          <Autocomplete
             className="form-input"
             placeholder="Select supplier or ledger..."
             value={supplierName}
-            onChange={(e) => setSupplierName(e.target.value)}
+            onChange={setSupplierName}
+            onSelect={(opt) => setSupplierName(opt.label)}
+            options={supplierOptions}
           />
         </div>
 

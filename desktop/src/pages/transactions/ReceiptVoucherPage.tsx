@@ -1,13 +1,16 @@
-import React, { useState } from 'react';
+import React, { useState, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Save, Printer } from 'lucide-react';
 import { useKeyboardShortcuts } from '../../hooks/useKeyboardShortcuts';
 import { formatCurrency } from '@agre/shared/utils/currency';
 import type { PaymentMode } from '@agre/shared/types';
 import { PAYMENT_MODE_LABELS } from '@agre/shared/constants';
+import Autocomplete, { type AutocompleteOption } from '../../components/Autocomplete';
+import { useMasters } from '../../stores/mastersStore';
 
 export default function ReceiptVoucherPage() {
   const navigate = useNavigate();
+  const { customers } = useMasters();
   const [date, setDate] = useState(new Date().toISOString().split('T')[0]);
   const [customerName, setCustomerName] = useState('');
   const [amount, setAmount] = useState<number | ''>('');
@@ -15,6 +18,19 @@ export default function ReceiptVoucherPage() {
   const [refNumber, setRefNumber] = useState('');
   const [narration, setNarration] = useState('');
   const [saved, setSaved] = useState(false);
+
+  const customerOptions = useMemo<AutocompleteOption[]>(
+    () =>
+      customers.map((c) => ({
+        label: c.name,
+        sublabel: c.outstanding_balance
+          ? `Due ${formatCurrency(c.outstanding_balance, '')}`
+          : c.phone || '',
+        value: c.id,
+        data: c,
+      })),
+    [customers]
+  );
 
   const handleSave = () => {
     if (!amount || amount <= 0) return;
@@ -55,12 +71,13 @@ export default function ReceiptVoucherPage() {
 
         <div className="form-group">
           <label className="form-label">Received From (Customer / Account)</label>
-          <input
-            type="text"
+          <Autocomplete
             className="form-input"
             placeholder="Select customer or ledger..."
             value={customerName}
-            onChange={(e) => setCustomerName(e.target.value)}
+            onChange={setCustomerName}
+            onSelect={(opt) => setCustomerName(opt.label)}
+            options={customerOptions}
           />
         </div>
 

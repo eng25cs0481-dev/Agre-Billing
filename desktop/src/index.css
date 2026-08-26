@@ -575,3 +575,45 @@ html, body {
 @keyframes spin {
   100% { transform: rotate(360deg); }
 }
+
+/* Autocomplete / master lookup dropdown */
+.ac-menu {
+  max-height: 260px;
+  overflow-y: auto;
+  background: #ffffff;
+  border: 1px solid #94bde0;
+  box-shadow: 0 6px 20px rgba(12, 60, 120, 0.22);
+  font-size: 12px;
+  padding: 2px;
+}
+.ac-option {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: 12px;
+  padding: 4px 8px;
+  cursor: pointer;
+  white-space: nowrap;
+}
+.ac-option.active {
+  background: var(--tp-selected-row);
+  color: var(--tp-selected-text);
+}
+.ac-label {
+  font-weight: 600;
+  color: var(--tp-text-main);
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.ac-option.active .ac-label {
+  color: var(--tp-selected-text);
+}
+.ac-sub {
+  font-size: 11px;
+  color: var(--tp-text-muted);
+  font-family: var(--font-mono);
+  flex-shrink: 0;
+}
+.ac-option.active .ac-sub {
+  color: #3a2a00;
+}

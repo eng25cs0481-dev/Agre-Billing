@@ -1,4 +1,4 @@
-import React, { useState, useRef, useCallback } from 'react';
+import React, { useState, useRef, useCallback, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useKeyboardShortcuts } from '../../hooks/useKeyboardShortcuts';
 import { calculateBillTotals } from '@agre/shared/calculations/billing';
@@ -6,6 +6,8 @@ import { formatCurrency } from '@agre/shared/utils/currency';
 import { formatDateLong } from '@agre/shared/utils/date';
 import type { VoucherItemInput, PaymentMode } from '@agre/shared/types';
 import { A4Invoice } from '../../components/InvoiceTemplates';
+import Autocomplete, { type AutocompleteOption } from '../../components/Autocomplete';
+import { useMasters } from '../../stores/mastersStore';
 
 interface CartItem extends VoucherItemInput {
   _key: string;
@@ -14,9 +16,10 @@ interface CartItem extends VoucherItemInput {
 
 export default function SaleVoucherPage() {
   const navigate = useNavigate();
+  const { customers, products } = useMasters();
   const [voucherNo, setVoucherNo] = useState('SAL/000001');
   const [partyName, setPartyName] = useState('');
-  const [partyBalance] = useState('0.00');
+  const [partyBalance, setPartyBalance] = useState('0.00');
   const [paymentMode, setPaymentMode] = useState<PaymentMode>('cash');
   const [narration, setNarration] = useState('Being goods sold.');
   const [billDiscount, setBillDiscount] = useState(0);
@@ -44,6 +47,51 @@ export default function SaleVoucherPage() {
   const updateItem = useCallback((key: string, field: keyof CartItem, value: any) => {
     setItems((prev) =>
       prev.map((item) => (item._key === key ? { ...item, [field]: value } : item))
+    );
+  }, []);
+
+  // Master-data suggestions
+  const customerOptions = useMemo<AutocompleteOption[]>(
+    () =>
+      customers.map((c) => ({
+        label: c.name,
+        sublabel: c.phone || c.city || '',
+        value: c.id,
+        data: c,
+      })),
+    [customers]
+  );
+
+  const productOptions = useMemo<AutocompleteOption[]>(
+    () =>
+      products.map((p) => ({
+        label: p.name,
+        sublabel: `${formatCurrency(p.selling_price, '')}${p.unit_symbol ? ' / ' + p.unit_symbol : ''}`,
+        value: p.id,
+        data: p,
+      })),
+    [products]
+  );
+
+  const selectCustomer = useCallback((opt: AutocompleteOption) => {
+    setPartyName(opt.label);
+    setPartyBalance(formatCurrency(opt.data?.outstanding_balance ?? 0, ''));
+  }, []);
+
+  // When a product is picked, auto-fill its selling rate and unit.
+  const selectProduct = useCallback((key: string, opt: AutocompleteOption) => {
+    const p = opt.data;
+    setItems((prev) =>
+      prev.map((item) =>
+        item._key === key
+          ? {
+              ...item,
+              product_name: opt.label,
+              rate: p?.selling_price || item.rate,
+              unit: p?.unit_symbol || item.unit,
+            }
+          : item
+      )
     );
   }, []);
 
@@ -91,11 +139,12 @@ export default function SaleVoucherPage() {
       <div className="tp-voucher-party-row" style={{ marginTop: 8 }}>
         <span className="tp-party-label">Party A/c name</span>
         <span style={{ marginRight: 6 }}>:</span>
-        <input
-          type="text"
+        <Autocomplete
           className="tp-party-input"
           value={partyName}
-          onChange={(e) => setPartyName(e.target.value)}
+          onChange={setPartyName}
+          onSelect={selectCustomer}
+          options={customerOptions}
           placeholder="Select customer or Walk-in"
         />
         <span className="tp-party-balance">Current balance : {partyBalance}</span>
@@ -140,9 +189,8 @@ export default function SaleVoucherPage() {
               return (
                 <tr key={item._key} className={index === items.length - 1 ? 'selected' : ''}>
                   <td>
-                    <input
-                      ref={index === items.length - 1 ? itemRef : undefined}
-                      type="text"
+                    <Autocomplete
+                      inputRef={index === items.length - 1 ? itemRef : undefined}
                       style={{
                         width: '100%',
                         border: 'none',
@@ -152,10 +200,10 @@ export default function SaleVoucherPage() {
                       }}
                       placeholder="Type item name..."
                       value={item.product_name}
-                      onChange={(e) => updateItem(item._key, 'product_name', e.target.value)}
-                      onKeyDown={(e) => {
-                        if (e.key === 'Enter') addItem();
-                      }}
+                      options={productOptions}
+                      onChange={(v) => updateItem(item._key, 'product_name', v)}
+                      onSelect={(opt) => selectProduct(item._key, opt)}
+                      onEnter={addItem}
                     />
                   </td>
                   <td className="num">

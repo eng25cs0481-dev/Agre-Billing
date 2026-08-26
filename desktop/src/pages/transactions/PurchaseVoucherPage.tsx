@@ -1,4 +1,4 @@
-import React, { useState, useRef, useCallback } from 'react';
+import React, { useState, useRef, useCallback, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Save, Printer, Plus, X } from 'lucide-react';
 import { useKeyboardShortcuts } from '../../hooks/useKeyboardShortcuts';
@@ -6,6 +6,8 @@ import { calculateBillTotals } from '@agre/shared/calculations/billing';
 import { formatCurrency } from '@agre/shared/utils/currency';
 import type { VoucherItemInput, PaymentMode } from '@agre/shared/types';
 import { PAYMENT_MODE_LABELS } from '@agre/shared/constants';
+import Autocomplete, { type AutocompleteOption } from '../../components/Autocomplete';
+import { useMasters } from '../../stores/mastersStore';
 
 interface CartItem extends VoucherItemInput {
   _key: string;
@@ -13,6 +15,7 @@ interface CartItem extends VoucherItemInput {
 
 export default function PurchaseVoucherPage() {
   const navigate = useNavigate();
+  const { suppliers, products } = useMasters();
   const [date, setDate] = useState(new Date().toISOString().split('T')[0]);
   const [supplierName, setSupplierName] = useState('');
   const [refNumber, setRefNumber] = useState('');
@@ -40,6 +43,40 @@ export default function PurchaseVoucherPage() {
   const updateItem = useCallback((key: string, field: keyof CartItem, value: any) => {
     setItems((prev) =>
       prev.map((item) => (item._key === key ? { ...item, [field]: value } : item))
+    );
+  }, []);
+
+  const supplierOptions = useMemo<AutocompleteOption[]>(
+    () =>
+      suppliers.map((s) => ({
+        label: s.name,
+        sublabel: s.phone || s.city || '',
+        value: s.id,
+        data: s,
+      })),
+    [suppliers]
+  );
+
+  const productOptions = useMemo<AutocompleteOption[]>(
+    () =>
+      products.map((p) => ({
+        label: p.name,
+        sublabel: `${formatCurrency(p.cost_price, '')}${p.unit_symbol ? ' / ' + p.unit_symbol : ''}`,
+        value: p.id,
+        data: p,
+      })),
+    [products]
+  );
+
+  // When a product is picked, auto-fill its cost/purchase rate.
+  const selectProduct = useCallback((key: string, opt: AutocompleteOption) => {
+    const p = opt.data;
+    setItems((prev) =>
+      prev.map((item) =>
+        item._key === key
+          ? { ...item, product_name: opt.label, rate: p?.cost_price || item.rate }
+          : item
+      )
     );
   }, []);
 
@@ -80,12 +117,13 @@ export default function PurchaseVoucherPage() {
         </div>
         <div className="voucher-field" style={{ flex: 1 }}>
           <label>Supplier</label>
-          <input
-            type="text"
+          <Autocomplete
             className="form-input"
             placeholder="Select or enter Supplier Name..."
             value={supplierName}
-            onChange={(e) => setSupplierName(e.target.value)}
+            onChange={setSupplierName}
+            onSelect={(opt) => setSupplierName(opt.label)}
+            options={supplierOptions}
           />
         </div>
         <div className="voucher-field">
@@ -140,17 +178,16 @@ export default function PurchaseVoucherPage() {
                 <tr key={item._key}>
                   <td style={{ color: 'var(--text-muted)', fontFamily: 'var(--font-mono)' }}>{index + 1}</td>
                   <td>
-                    <input
-                      ref={index === items.length - 1 ? itemRef : undefined}
-                      type="text"
+                    <Autocomplete
+                      inputRef={index === items.length - 1 ? itemRef : undefined}
                       className="form-input"
                       placeholder="Product description..."
                       value={item.product_name}
-                      onChange={(e) => updateItem(item._key, 'product_name', e.target.value)}
+                      options={productOptions}
+                      onChange={(v) => updateItem(item._key, 'product_name', v)}
+                      onSelect={(opt) => selectProduct(item._key, opt)}
+                      onEnter={addItem}
                       style={{ width: '100%', padding: '2px 6px' }}
-                      onKeyDown={(e) => {
-                        if (e.key === 'Enter') addItem();
-                      }}
                     />
                   </td>
                   <td>
