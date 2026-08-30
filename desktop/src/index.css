@@ -382,7 +382,7 @@ html, body {
   font-family: var(--font-mono);
   font-weight: bold;
   font-size: 12px;
-  color: #000;
+  color: #111827;
 }
 
 .tp-voucher-party-row {
@@ -407,6 +407,7 @@ html, body {
   border: 1px solid #94bde0;
   padding: 3px 8px;
   font-size: 12px;
+  color: #111827;
 }
 .tp-party-input:focus {
   background: var(--tp-active-yellow);

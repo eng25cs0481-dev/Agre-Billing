@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Outlet, useNavigate, useLocation } from 'react-router-dom';
 import { useAppStore } from '../stores/appStore';
 import { useGlobalShortcuts } from '../hooks/useKeyboardShortcuts';
@@ -14,6 +14,12 @@ export default function AppLayout() {
 
   useGlobalShortcuts();
 
+  useEffect(() => {
+    if (!company) {
+      navigate('/select-company');
+    }
+  }, [company, navigate]);
+
   // Determine current screen title for the Sky Blue ribbon
   const getScreenTitle = () => {
     const p = location.pathname;
@@ -26,6 +32,7 @@ export default function AppLayout() {
     if (p.includes('/reports/daybook')) return 'Day Book';
     if (p.includes('/reports/stock-summary')) return 'Stock Summary';
     if (p.includes('/reports/outstanding')) return 'Outstanding Details';
+    if (p.includes('/reports/analytics')) return 'Business Analytics Dashboard';
     if (p.includes('/masters/products')) return 'List of Products / Stock Items';
     if (p.includes('/masters/customers')) return 'List of Sundry Debtors (Customers)';
     if (p.includes('/masters/suppliers')) return 'List of Sundry Creditors (Suppliers)';
@@ -47,7 +54,7 @@ export default function AppLayout() {
         </div>
 
         <div className="tp-top-nav">
-          <div className="tp-top-btn" onClick={() => navigate('/settings')}>
+          <div className="tp-top-btn" onClick={() => navigate('/select-company')}>
             <span style={{ textDecoration: 'underline', fontWeight: 'bold' }}>K</span>: Company
           </div>
           <div className="tp-top-btn" onClick={() => navigate('/utilities/sync')}>
@@ -116,7 +123,7 @@ export default function AppLayout() {
           }}>
             <span>F2: Date</span>
           </div>
-          <div className="tp-fbar-btn" onClick={() => navigate('/settings')}>
+          <div className="tp-fbar-btn" onClick={() => navigate('/select-company')}>
             <span>F3: Company</span>
           </div>
           <div className="tp-fbar-divider" />
@@ -144,6 +151,9 @@ export default function AppLayout() {
           </div>
           <div className={`tp-fbar-btn ${location.pathname.includes('/outstanding') ? 'active' : ''}`} onClick={() => navigate('/reports/outstanding')}>
             <span>Outstanding</span>
+          </div>
+          <div className={`tp-fbar-btn ${location.pathname.includes('/analytics') ? 'active' : ''}`} onClick={() => navigate('/reports/analytics')}>
+            <span>📈 Analytics</span>
           </div>
           <div className="tp-fbar-divider" />
           <div className="tp-fbar-btn" onClick={() => window.print()}>

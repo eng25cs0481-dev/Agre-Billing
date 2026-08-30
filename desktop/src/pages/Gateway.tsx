@@ -39,6 +39,7 @@ const GATEWAY_MENU: MenuCategory[] = [
       { label: 'Day Book', hotkey: 'D', path: '/reports/daybook' },
       { label: 'Stock Summary', hotkey: 'T', path: '/reports/stock-summary' },
       { label: 'Outstanding Dues', hotkey: 'O', path: '/reports/outstanding' },
+      { label: 'Analytics Dashboard', hotkey: 'A', path: '/reports/analytics' },
     ],
   },
   {
@@ -70,6 +71,7 @@ export default function Gateway() {
     { key: 'd', action: () => navigate('/reports/daybook'), description: 'Day Book' },
     { key: 't', action: () => navigate('/reports/stock-summary'), description: 'Stock' },
     { key: 'o', action: () => navigate('/reports/outstanding'), description: 'Outstanding' },
+    { key: 'a', action: () => navigate('/reports/analytics'), description: 'Analytics' },
   ]);
 
   let globalIdx = -1;

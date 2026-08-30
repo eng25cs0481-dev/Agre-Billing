@@ -121,12 +121,21 @@ export function useGlobalShortcuts() {
 
   useKeyboardShortcuts(
     [
+      { key: 'F3', action: () => navigate('/select-company'), description: 'Company Selection' },
       { key: 'F5', action: () => navigate('/transactions/payment'), description: 'Payment' },
       { key: 'F6', action: () => navigate('/transactions/receipt'), description: 'Receipt' },
       { key: 'F7', action: () => navigate('/transactions/expense'), description: 'Journal / Expense' },
       { key: 'F8', action: () => navigate('/transactions/sale'), description: 'Sales' },
       { key: 'F9', action: () => navigate('/transactions/purchase'), description: 'Purchase' },
       { key: 'Escape', action: () => navigate(-1), description: 'Back' },
+      { key: 'k', alt: true, action: () => navigate('/select-company'), description: 'Company Menu' },
+      { key: 'y', alt: true, action: () => navigate('/utilities/sync'), description: 'Data Menu' },
+      { key: 'z', alt: true, action: () => navigate('/utilities/sync'), description: 'Exchange Menu' },
+      { key: 'g', alt: true, action: () => navigate('/'), description: 'Go To' },
+      { key: 'o', alt: true, action: () => navigate('/utilities/import'), description: 'Import Data' },
+      { key: 'e', alt: true, action: () => navigate('/utilities/export'), description: 'Export Data' },
+      { key: 'p', alt: true, action: () => window.print(), description: 'Print' },
+      { key: 'F1', action: () => alert('Agre Billing Help & Shortcuts: F5=Payment, F6=Receipt, F8=Sales, F9=Purchase, Ctrl+S=Save, Esc=Quit'), description: 'Help' },
     ],
     GLOBAL_PRIORITY
   );

@@ -3,6 +3,7 @@ import { HashRouter, Routes, Route } from 'react-router-dom';
 import AppLayout from './layouts/AppLayout';
 import Gateway from './pages/Gateway';
 import PlaceholderPage from './pages/PlaceholderPage';
+import { CompanySelectionPage } from './pages/CompanySelectionPage';
 
 // Masters
 import ProductsPage from './pages/masters/ProductsPage';
@@ -26,6 +27,7 @@ import ExpenseVoucherPage from './pages/transactions/ExpenseVoucherPage';
 import DayBookPage from './pages/reports/DayBookPage';
 import StockSummaryPage from './pages/reports/StockSummaryPage';
 import OutstandingPage from './pages/reports/OutstandingPage';
+import AnalyticsPage from './pages/reports/AnalyticsPage';
 
 // Utilities & Settings
 import SettingsPage from './pages/settings/SettingsPage';
@@ -38,6 +40,9 @@ export default function App() {
   return (
     <HashRouter>
       <Routes>
+        {/* Auth / Select Company */}
+        <Route path="/select-company" element={<CompanySelectionPage />} />
+        
         <Route element={<AppLayout />}>
           {/* Gateway */}
           <Route path="/" element={<Gateway />} />
@@ -76,6 +81,7 @@ export default function App() {
           <Route path="/reports/purchase-register" element={<PlaceholderPage title="Purchase Register" />} />
           <Route path="/reports/stock-summary" element={<StockSummaryPage />} />
           <Route path="/reports/outstanding" element={<OutstandingPage />} />
+          <Route path="/reports/analytics" element={<AnalyticsPage />} />
           <Route path="/reports/cash-book" element={<PlaceholderPage title="Cash Book" />} />
           <Route path="/reports/bank-book" element={<PlaceholderPage title="Bank Book" />} />
 

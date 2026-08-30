@@ -30,17 +30,21 @@ const columns: Column<ProductWithStock>[] = [
   },
 ];
 
+import { useAppStore } from '../../stores/appStore';
+
 export default function ProductsPage() {
   const navigate = useNavigate();
+  const company = useAppStore(s => s.company);
   const [products, setProducts] = useState<ProductWithStock[]>([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    api.getProducts().then((data) => {
+    if (!company) return;
+    api.getProducts(company.id).then((data) => {
       setProducts(data);
       setLoading(false);
     });
-  }, []);
+  }, [company]);
 
   return (
     <MasterListPage

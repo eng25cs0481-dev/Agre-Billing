@@ -45,6 +45,7 @@ export interface Product extends Timestamps, CompanyScoped, SoftDeletable {
   cost_price: number;
   selling_price: number;
   wholesale_price?: number;
+  special_price?: number;
   minimum_stock: number;
   description?: string;
   image_url?: string;
@@ -58,6 +59,7 @@ export interface ProductCreate extends CompanyScoped {
   cost_price: number;
   selling_price: number;
   wholesale_price?: number;
+  special_price?: number;
   minimum_stock?: number;
   description?: string;
   image_url?: string;

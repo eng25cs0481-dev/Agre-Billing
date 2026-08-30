@@ -2,20 +2,23 @@ import React, { useState, useEffect } from 'react';
 import { formatCurrency } from '@agre/shared/utils/currency';
 import type { CustomerWithBalance, SupplierWithBalance } from '@agre/shared/types';
 import { api } from '../../services/api';
+import { useAppStore } from '../../stores/appStore';
 
 export default function OutstandingPage() {
+  const company = useAppStore(s => s.company);
   const [tab, setTab] = useState<'receivables' | 'payables'>('receivables');
   const [receivables, setReceivables] = useState<CustomerWithBalance[]>([]);
   const [payables, setPayables] = useState<SupplierWithBalance[]>([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    Promise.all([api.getCustomers(), api.getSuppliers()]).then(([c, s]) => {
+    if (!company) return;
+    Promise.all([api.getCustomers(company.id), api.getSuppliers(company.id)]).then(([c, s]) => {
       setReceivables(c.filter((item) => item.outstanding_balance > 0));
       setPayables(s.filter((item) => item.outstanding_balance > 0));
       setLoading(false);
     });
-  }, []);
+  }, [company]);
 
   const totalReceivable = receivables.reduce((s, r) => s + (r.outstanding_balance || 0), 0);
   const totalPayable = payables.reduce((s, p) => s + (p.outstanding_balance || 0), 0);

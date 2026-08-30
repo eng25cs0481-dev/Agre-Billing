@@ -14,6 +14,7 @@ export default function CustomerFormPage() {
   const [email, setEmail] = useState('');
   const [address, setAddress] = useState('');
   const [city, setCity] = useState('');
+  const [district, setDistrict] = useState('');
   const [state, setState] = useState('Maharashtra');
   const [creditLimit, setCreditLimit] = useState<number | ''>('');
   const [openingBalance, setOpeningBalance] = useState<number | ''>('');
@@ -31,6 +32,7 @@ export default function CustomerFormPage() {
           setEmail(data.email || '');
           setAddress(data.address || '');
           setCity(data.city || '');
+          setDistrict(data.district || '');
           setState(data.state || 'Maharashtra');
           setCreditLimit(data.credit_limit ?? '');
           setOpeningBalance(data.opening_balance ?? '');
@@ -45,6 +47,18 @@ export default function CustomerFormPage() {
       alert('Please enter Customer Name');
       return;
     }
+    if (!city.trim()) {
+      alert('Please enter City (required for analytics)');
+      return;
+    }
+    if (!district.trim()) {
+      alert('Please enter District (required for analytics)');
+      return;
+    }
+    if (!state.trim()) {
+      alert('Please enter State (required for analytics)');
+      return;
+    }
 
     setSaving(true);
 
@@ -56,8 +70,9 @@ export default function CustomerFormPage() {
           phone: phone.trim() || undefined,
           email: email.trim() || undefined,
           address: address.trim() || undefined,
-          city: city.trim() || undefined,
-          state: state.trim() || undefined,
+          city: city.trim(),
+          district: district.trim(),
+          state: state.trim(),
           credit_limit: Number(creditLimit) || 0,
           opening_balance: Number(openingBalance) || 0,
           is_active: true,
@@ -217,15 +232,43 @@ export default function CustomerFormPage() {
 
             <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12, marginBottom: 10 }}>
               <div style={{ display: 'flex', alignItems: 'center' }}>
-                <span style={{ width: 100 }}>City</span>
+                <span style={{ width: 100, fontWeight: 600 }}>City <span style={{ color: '#dc2626' }}>*</span></span>
                 <span style={{ marginRight: 6 }}>:</span>
                 <input
                   type="text"
                   className="tp-party-input"
-                  style={{ width: 130 }}
+                  style={{ width: 130, borderColor: !city.trim() ? '#dc2626' : undefined }}
                   placeholder="Pune / Mumbai"
                   value={city}
                   onChange={(e) => setCity(e.target.value)}
+                />
+              </div>
+
+              <div style={{ display: 'flex', alignItems: 'center' }}>
+                <span style={{ width: 80, fontWeight: 600 }}>District <span style={{ color: '#dc2626' }}>*</span></span>
+                <span style={{ marginRight: 6 }}>:</span>
+                <input
+                  type="text"
+                  className="tp-party-input"
+                  style={{ width: 140, borderColor: !district.trim() ? '#dc2626' : undefined }}
+                  placeholder="e.g. Pune"
+                  value={district}
+                  onChange={(e) => setDistrict(e.target.value)}
+                />
+              </div>
+            </div>
+
+            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12, marginBottom: 10 }}>
+              <div style={{ display: 'flex', alignItems: 'center' }}>
+                <span style={{ width: 100, fontWeight: 600 }}>State <span style={{ color: '#dc2626' }}>*</span></span>
+                <span style={{ marginRight: 6 }}>:</span>
+                <input
+                  type="text"
+                  className="tp-party-input"
+                  style={{ width: 130, borderColor: !state.trim() ? '#dc2626' : undefined }}
+                  placeholder="Maharashtra"
+                  value={state}
+                  onChange={(e) => setState(e.target.value)}
                 />
               </div>
 

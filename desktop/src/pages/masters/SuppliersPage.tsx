@@ -24,17 +24,21 @@ const columns: Column<SupplierWithBalance>[] = [
   },
 ];
 
+import { useAppStore } from '../../stores/appStore';
+
 export default function SuppliersPage() {
   const navigate = useNavigate();
+  const company = useAppStore(s => s.company);
   const [suppliers, setSuppliers] = useState<SupplierWithBalance[]>([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    api.getSuppliers().then((data) => {
+    if (!company) return;
+    api.getSuppliers(company.id).then((data) => {
       setSuppliers(data);
       setLoading(false);
     });
-  }, []);
+  }, [company]);
 
   return (
     <MasterListPage

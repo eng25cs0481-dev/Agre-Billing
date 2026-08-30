@@ -4,18 +4,21 @@ import { useKeyboardShortcuts } from '../../hooks/useKeyboardShortcuts';
 import { formatDateDMY } from '@agre/shared/utils/date';
 import type { DayBookEntry } from '@agre/shared/types';
 import { api } from '../../services/api';
+import { useAppStore } from '../../stores/appStore';
 
 export default function DayBookPage() {
   const navigate = useNavigate();
+  const company = useAppStore(s => s.company);
   const [entries, setEntries] = useState<DayBookEntry[]>([]);
   const [selectedIndex, setSelectedIndex] = useState(0);
   const [dateFilter] = useState(new Date().toISOString().split('T')[0]);
 
   useEffect(() => {
-    api.getDayBook(dateFilter, dateFilter).then((data) => {
+    if (!company) return;
+    api.getDayBook(company.id, dateFilter, dateFilter).then((data) => {
       setEntries(data);
     });
-  }, [dateFilter]);
+  }, [dateFilter, company]);
 
   const totalDebit = entries.reduce((sum, r) => sum + r.debit, 0);
   const totalCredit = entries.reduce((sum, r) => sum + r.credit, 0);

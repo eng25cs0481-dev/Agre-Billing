@@ -158,18 +158,14 @@ export default function Autocomplete({
         onChange={(e) => {
           const val = e.target.value;
           onChange(val);
-          if (val.trim().length > 0) {
-            if (!open) openMenu();
-            else updateRect();
-          } else {
-            setOpen(false);
-          }
+          if (!open) openMenu();
+          else updateRect();
         }}
         onFocus={() => {
-          if (value.trim().length > 0) openMenu();
+          openMenu();
         }}
         onClick={() => {
-          if (!open && value.trim().length > 0) openMenu();
+          if (!open) openMenu();
         }}
         onBlur={() => {
           // Delay so an option's onMouseDown selection registers before closing.

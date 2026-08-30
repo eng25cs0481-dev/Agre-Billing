@@ -8,17 +8,19 @@ import {
   ActivityIndicator,
 } from 'react-native';
 import { formatCurrency } from '@agre/shared';
-import { LinearGradient } from 'expo-linear-gradient';
 import { Feather, Ionicons } from '@expo/vector-icons';
 import { supabase } from '../lib/supabase';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { useAppStore } from '../stores/appStore';
 
 interface DashboardProps {
   onNavigate: (screen: string) => void;
+  onMenuPress: () => void;
 }
 
-export const DashboardScreen: React.FC<DashboardProps> = ({ onNavigate }) => {
+export const DashboardScreen: React.FC<DashboardProps> = ({ onNavigate, onMenuPress }) => {
   const insets = useSafeAreaInsets();
+  const company = useAppStore(s => s.company);
   
   const [loading, setLoading] = useState(true);
   const [products, setProducts] = useState<any[]>([]);
@@ -31,18 +33,16 @@ export const DashboardScreen: React.FC<DashboardProps> = ({ onNavigate }) => {
 
   useEffect(() => {
     async function loadDashboardData() {
+      if (!company) return;
       try {
-        // Fetch total items count
         const { count: itemsCount } = await supabase
           .from('products')
           .select('*', { count: 'exact', head: true });
         
-        // Fetch total customers count
         const { count: customersCount } = await supabase
           .from('customers')
           .select('*', { count: 'exact', head: true });
 
-        // Fetch top products for snapshot
         const { data: prodData } = await supabase
           .from('products')
           .select('*')
@@ -59,79 +59,74 @@ export const DashboardScreen: React.FC<DashboardProps> = ({ onNavigate }) => {
       }
     }
     loadDashboardData();
-  }, []);
+  }, [company]);
 
   return (
-    <LinearGradient
-      colors={['#060B1F', '#0A0F2C', '#10173A']}
-      style={[styles.container, { paddingTop: insets.top }]}
-    >
+    <View style={[styles.container, { paddingTop: insets.top }]}>
       <ScrollView contentContainerStyle={styles.scrollContent} showsVerticalScrollIndicator={false}>
         
-        {/* Header */}
+        {/* Header with Hamburger */}
         <View style={styles.header}>
-          <View>
-            <Text style={styles.shopName}>AGRE MACHINERY</Text>
+          <TouchableOpacity onPress={onMenuPress} style={styles.menuBtn}>
+            <Feather name="menu" size={24} color="#0f172a" />
+          </TouchableOpacity>
+          <View style={styles.headerTextContainer}>
+            <Text style={styles.shopName}>{company?.name || 'Agre Billing'}</Text>
             <Text style={styles.dateText}>
               {new Date().toLocaleDateString('en-IN', { weekday: 'long', day: 'numeric', month: 'short' })}
             </Text>
           </View>
           <TouchableOpacity style={styles.profileBtn}>
-            <Feather name="user" size={20} color="#ffab40" />
+            <Feather name="bell" size={20} color="#64748b" />
           </TouchableOpacity>
         </View>
 
         {/* Primary Action Button */}
         <TouchableOpacity style={styles.newSaleBtn} onPress={() => onNavigate('sale')}>
-          <LinearGradient
-            colors={['#FF8F00', '#EF6C00']}
-            start={{ x: 0, y: 0 }}
-            end={{ x: 1, y: 0 }}
-            style={styles.newSaleGradient}
-          >
+          <View style={styles.newSaleGradient}>
             <Feather name="plus-circle" size={20} color="#ffffff" style={{ marginRight: 8 }} />
-            <Text style={styles.newSaleBtnText}>NEW SALE (BILL)</Text>
-          </LinearGradient>
+            <Text style={styles.newSaleBtnText}>New Sale Invoice</Text>
+          </View>
         </TouchableOpacity>
 
         {/* KPI Row 1: Today's Sales */}
-        <LinearGradient colors={['rgba(255,255,255,0.07)', 'rgba(255,255,255,0.02)']} style={styles.kpiCardFull}>
+        <View style={styles.kpiCardFull}>
           <View style={styles.kpiHeader}>
             <Text style={styles.kpiLabel}>TODAY'S SALES</Text>
-            <Feather name="trending-up" size={14} color="#66bb6a" />
+            <Feather name="trending-up" size={16} color="#16a34a" />
           </View>
           <Text style={styles.kpiValueLarge}>{formatCurrency(todaySales)}</Text>
           <Text style={styles.kpiSub}>{billsCount} Invoices Created</Text>
-        </LinearGradient>
+        </View>
 
         {/* KPI Row 2: Items & Customers */}
         <View style={styles.kpiContainer}>
-          <LinearGradient colors={['rgba(255,255,255,0.07)', 'rgba(255,255,255,0.02)']} style={styles.kpiCard}>
+          <View style={styles.kpiCard}>
             <View style={styles.kpiHeader}>
               <Text style={styles.kpiLabel}>TOTAL ITEMS</Text>
-              <Feather name="package" size={14} color="#42a5f5" />
+              <Feather name="package" size={16} color="#2563eb" />
             </View>
             <Text style={styles.kpiValue}>{totalItems}</Text>
             <Text style={styles.kpiSub}>In Stock</Text>
-          </LinearGradient>
+          </View>
 
-          <LinearGradient colors={['rgba(255,255,255,0.07)', 'rgba(255,255,255,0.02)']} style={styles.kpiCard}>
+          <View style={styles.kpiCard}>
             <View style={styles.kpiHeader}>
               <Text style={styles.kpiLabel}>CUSTOMERS</Text>
-              <Feather name="users" size={14} color="#ab47bc" />
+              <Feather name="users" size={16} color="#7c3aed" />
             </View>
             <Text style={styles.kpiValue}>{totalCustomers}</Text>
             <Text style={styles.kpiSub}>Registered</Text>
-          </LinearGradient>
+          </View>
         </View>
 
         {/* Live Data Sections */}
         {loading ? (
-          <ActivityIndicator size="large" color="#ffab40" style={{ marginTop: 40 }} />
+          <ActivityIndicator size="large" color="#2563eb" style={{ marginTop: 40 }} />
         ) : (
           <View style={styles.listSection}>
             <View style={styles.listHeader}>
-              <Text style={styles.sectionTitle}>INVENTORY SNAPSHOT</Text>
+              <Text style={styles.sectionTitle}>RECENT INVENTORY</Text>
               <TouchableOpacity onPress={() => onNavigate('products')}>
                 <Text style={styles.seeAll}>Manage Stock</Text>
               </TouchableOpacity>
@@ -142,14 +137,14 @@ export const DashboardScreen: React.FC<DashboardProps> = ({ onNavigate }) => {
             ) : (
               products.map((p) => (
                 <View key={p.id} style={styles.listItem}>
-                  <View style={[styles.avatar, { backgroundColor: 'rgba(255,171,64,0.1)' }]}>
-                    <Feather name="box" size={16} color="#ffab40" />
+                  <View style={[styles.avatar, { backgroundColor: '#eff6ff' }]}>
+                    <Feather name="box" size={18} color="#2563eb" />
                   </View>
                   <View style={styles.listInfo}>
                     <Text style={styles.listName}>{p.name}</Text>
                     <Text style={styles.listSub}>Stock: {p.current_stock || 0} {p.unit || 'pcs'}</Text>
                   </View>
-                  <Text style={styles.listBalance}>{formatCurrency(p.sale_price || 0)}</Text>
+                  <Text style={styles.listBalance}>{formatCurrency(p.selling_price || 0)}</Text>
                 </View>
               ))
             )}
@@ -159,13 +154,14 @@ export const DashboardScreen: React.FC<DashboardProps> = ({ onNavigate }) => {
         {/* Bottom spacer */}
         <View style={{ height: 40 }} />
       </ScrollView>
-    </LinearGradient>
+    </View>
   );
 };
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
+    backgroundColor: '#f8fafc',
   },
   scrollContent: {
     padding: 20,
@@ -173,38 +169,50 @@ const styles = StyleSheet.create({
   header: {
     flexDirection: 'row',
     justifyContent: 'space-between',
-    alignItems: 'flex-start',
+    alignItems: 'center',
     marginBottom: 24,
   },
+  menuBtn: {
+    padding: 4,
+    marginRight: 12,
+  },
+  headerTextContainer: {
+    flex: 1,
+  },
   shopName: {
-    color: '#ffffff',
-    fontSize: 22,
+    color: '#0f172a',
+    fontSize: 20,
     fontWeight: '800',
-    letterSpacing: 0.5,
+    letterSpacing: -0.5,
   },
   dateText: {
-    color: '#9fa8da',
+    color: '#64748b',
     fontSize: 13,
-    marginTop: 4,
+    marginTop: 2,
+    fontWeight: '500',
   },
   profileBtn: {
     width: 40,
     height: 40,
     borderRadius: 20,
-    backgroundColor: 'rgba(255,255,255,0.08)',
+    backgroundColor: '#ffffff',
     alignItems: 'center',
     justifyContent: 'center',
     borderWidth: 1,
-    borderColor: 'rgba(255,255,255,0.15)',
+    borderColor: '#e2e8f0',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 1 },
+    shadowOpacity: 0.05,
+    shadowRadius: 2,
   },
   newSaleBtn: {
     marginBottom: 24,
     borderRadius: 12,
-    elevation: 8,
-    shadowColor: '#ef6c00',
+    shadowColor: '#2563eb',
     shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.3,
+    shadowOpacity: 0.2,
     shadowRadius: 8,
+    elevation: 5,
   },
   newSaleGradient: {
     flexDirection: 'row',
@@ -212,19 +220,25 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
     borderRadius: 12,
+    backgroundColor: '#2563eb',
   },
   newSaleBtnText: {
     color: '#ffffff',
     fontSize: 16,
-    fontWeight: '900',
-    letterSpacing: 1,
+    fontWeight: '700',
   },
   kpiCardFull: {
     padding: 20,
     borderRadius: 16,
+    backgroundColor: '#ffffff',
     borderWidth: 1,
-    borderColor: 'rgba(255,255,255,0.1)',
+    borderColor: '#e2e8f0',
     marginBottom: 16,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.05,
+    shadowRadius: 6,
+    elevation: 2,
   },
   kpiContainer: {
     flexDirection: 'row',
@@ -235,8 +249,14 @@ const styles = StyleSheet.create({
     flex: 1,
     padding: 16,
     borderRadius: 16,
+    backgroundColor: '#ffffff',
     borderWidth: 1,
-    borderColor: 'rgba(255,255,255,0.1)',
+    borderColor: '#e2e8f0',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.05,
+    shadowRadius: 6,
+    elevation: 2,
   },
   kpiHeader: {
     flexDirection: 'row',
@@ -244,34 +264,36 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   kpiLabel: {
-    color: '#9fa8da',
-    fontSize: 10,
-    fontWeight: '800',
-    letterSpacing: 1,
+    color: '#64748b',
+    fontSize: 11,
+    fontWeight: '700',
+    letterSpacing: 0.5,
   },
   kpiValueLarge: {
-    color: '#ffffff',
+    color: '#0f172a',
     fontSize: 32,
     fontWeight: '800',
     marginTop: 8,
+    letterSpacing: -1,
   },
   kpiValue: {
-    color: '#ffffff',
+    color: '#0f172a',
     fontSize: 24,
     fontWeight: '800',
     marginTop: 8,
+    letterSpacing: -0.5,
   },
   kpiSub: {
-    color: '#7986cb',
-    fontSize: 11,
+    color: '#94a3b8',
+    fontSize: 12,
     marginTop: 4,
     fontWeight: '500',
   },
   sectionTitle: {
-    color: '#7986cb',
-    fontSize: 11,
-    fontWeight: '800',
-    letterSpacing: 1.5,
+    color: '#64748b',
+    fontSize: 12,
+    fontWeight: '700',
+    letterSpacing: 1,
     marginBottom: 16,
   },
   listSection: {
@@ -283,26 +305,30 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   seeAll: {
-    color: '#ffab40',
-    fontSize: 12,
+    color: '#2563eb',
+    fontSize: 13,
     fontWeight: '700',
     marginBottom: 16,
   },
   listItem: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: 'rgba(255,255,255,0.03)',
+    backgroundColor: '#ffffff',
     padding: 12,
     borderRadius: 12,
     marginBottom: 8,
     borderWidth: 1,
-    borderColor: 'rgba(255,255,255,0.05)',
+    borderColor: '#e2e8f0',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 1 },
+    shadowOpacity: 0.02,
+    shadowRadius: 2,
+    elevation: 1,
   },
   avatar: {
-    width: 40,
-    height: 40,
-    borderRadius: 20,
-    backgroundColor: 'rgba(159, 168, 218, 0.15)',
+    width: 44,
+    height: 44,
+    borderRadius: 8,
     alignItems: 'center',
     justifyContent: 'center',
     marginRight: 12,
@@ -311,23 +337,23 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   listName: {
-    color: '#ffffff',
-    fontSize: 14,
+    color: '#0f172a',
+    fontSize: 15,
     fontWeight: '600',
     marginBottom: 2,
   },
   listSub: {
-    color: '#9fa8da',
-    fontSize: 12,
+    color: '#64748b',
+    fontSize: 13,
   },
   listBalance: {
-    color: '#ffffff',
-    fontSize: 14,
-    fontWeight: '800',
+    color: '#0f172a',
+    fontSize: 15,
+    fontWeight: '700',
   },
   emptyText: {
-    color: '#7986cb',
-    fontSize: 13,
+    color: '#94a3b8',
+    fontSize: 14,
     fontStyle: 'italic',
     textAlign: 'center',
     paddingVertical: 12,

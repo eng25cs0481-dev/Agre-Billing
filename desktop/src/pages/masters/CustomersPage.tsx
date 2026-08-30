@@ -26,17 +26,21 @@ const columns: Column<CustomerWithBalance>[] = [
   },
 ];
 
+import { useAppStore } from '../../stores/appStore';
+
 export default function CustomersPage() {
   const navigate = useNavigate();
+  const company = useAppStore(s => s.company);
   const [customers, setCustomers] = useState<CustomerWithBalance[]>([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    api.getCustomers().then((data) => {
+    if (!company) return;
+    api.getCustomers(company.id).then((data) => {
       setCustomers(data);
       setLoading(false);
     });
-  }, []);
+  }, [company]);
 
   return (
     <MasterListPage

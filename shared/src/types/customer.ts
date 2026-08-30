@@ -11,8 +11,9 @@ export interface Customer extends Timestamps, CompanyScoped, SoftDeletable {
   phone?: string;
   email?: string;
   address?: string;
-  city?: string;
-  state?: string;
+  city: string;
+  district: string;
+  state: string;
   ledger_id?: string;
   opening_balance: number;
   credit_limit?: number;
@@ -26,8 +27,9 @@ export interface CustomerCreate extends CompanyScoped {
   phone?: string;
   email?: string;
   address?: string;
-  city?: string;
-  state?: string;
+  city: string;
+  district: string;
+  state: string;
   opening_balance?: number;
   credit_limit?: number;
   payment_terms?: number;

@@ -2,17 +2,20 @@ import React, { useState, useEffect } from 'react';
 import { formatCurrency } from '@agre/shared/utils/currency';
 import type { StockSummary } from '@agre/shared/types';
 import { api } from '../../services/api';
+import { useAppStore } from '../../stores/appStore';
 
 export default function StockSummaryPage() {
+  const company = useAppStore(s => s.company);
   const [stock, setStock] = useState<StockSummary[]>([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    api.getStockSummary().then((data) => {
+    if (!company) return;
+    api.getStockSummary(company.id).then((data) => {
       setStock(data);
       setLoading(false);
     });
-  }, []);
+  }, [company]);
 
   const totalValue = stock.reduce((sum, s) => sum + s.stock_value, 0);
   const lowStockCount = stock.filter((s) => s.is_below_minimum).length;

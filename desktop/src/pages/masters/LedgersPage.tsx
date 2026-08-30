@@ -31,16 +31,20 @@ const columns: Column<any>[] = [
   },
 ];
 
+import { useAppStore } from '../../stores/appStore';
+
 export default function LedgersPage() {
+  const company = useAppStore(s => s.company);
   const [ledgers, setLedgers] = useState<(Ledger & { group_name: string; balance: number })[]>([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    api.getLedgers().then((data) => {
+    if (!company) return;
+    api.getLedgers(company.id).then((data) => {
       setLedgers(data);
       setLoading(false);
     });
-  }, []);
+  }, [company]);
 
   return (
     <MasterListPage

@@ -6,6 +6,7 @@ import type {
   ProductWithStock,
 } from '@agre/shared/types';
 import { api } from '../services/api';
+import { useAppStore } from './appStore';
 
 interface MastersState {
   customers: CustomerWithBalance[];
@@ -26,15 +27,18 @@ export const useMastersStore = create<MastersState>((set, get) => ({
 
   loadAll: async (force = false) => {
     const { loading, loaded } = get();
+    const companyId = useAppStore.getState().company?.id;
+    if (!companyId) return;
+
     if (loading) return;
     if (loaded && !force) return;
 
     set({ loading: true });
     try {
       const [customers, suppliers, products] = await Promise.all([
-        api.getCustomers(),
-        api.getSuppliers(),
-        api.getProducts(),
+        api.getCustomers(companyId),
+        api.getSuppliers(companyId),
+        api.getProducts(companyId),
       ]);
       set({ customers, suppliers, products, loaded: true, loading: false });
     } catch (err) {

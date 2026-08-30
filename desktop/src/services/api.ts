@@ -9,8 +9,52 @@ import type {
 } from '@agre/shared/types';
 
 export const api = {
+  // ============================================================
+  // Companies
+  // ============================================================
+  
+  async getCompanies() {
+    if (!isSupabaseConfigured()) return [];
+    // If not using RLS with user_roles perfectly yet, we can just fetch all companies for now
+    const { data, error } = await supabase
+      .from('companies')
+      .select('*')
+      .order('created_at', { ascending: false });
+      
+    if (error) {
+      console.warn('Supabase fetch companies error:', error.message);
+      return [];
+    }
+    return data || [];
+  },
+
+  async createCompany(payload: Partial<any>) {
+    if (!isSupabaseConfigured()) throw new Error('Supabase not configured');
+    
+    // 1. Insert company
+    const { data: comp, error: compError } = await supabase
+      .from('companies')
+      .insert([payload])
+      .select()
+      .single();
+      
+    if (compError) throw compError;
+    
+    // 2. Create financial year for this company
+    const fyPayload = {
+      company_id: comp.id,
+      name: `FY ${new Date(comp.books_beginning_date).getFullYear()}-${new Date(comp.books_beginning_date).getFullYear() + 1}`,
+      start_date: comp.books_beginning_date,
+      end_date: `${new Date(comp.books_beginning_date).getFullYear() + 1}-03-31`,
+    };
+    
+    await supabase.from('financial_years').insert([fyPayload]);
+    
+    return comp;
+  },
+
   // Products
-  async getProducts(): Promise<ProductWithStock[]> {
+  async getProducts(companyId: string): Promise<ProductWithStock[]> {
     if (!isSupabaseConfigured()) return [];
     const { data, error } = await supabase
       .from('products')
@@ -30,7 +74,7 @@ export const api = {
   },
 
   // Customers
-  async getCustomers(): Promise<CustomerWithBalance[]> {
+  async getCustomers(companyId: string): Promise<CustomerWithBalance[]> {
     if (!isSupabaseConfigured()) return [];
     const { data, error } = await supabase
       .from('customers')
@@ -49,7 +93,7 @@ export const api = {
   },
 
   // Suppliers
-  async getSuppliers(): Promise<SupplierWithBalance[]> {
+  async getSuppliers(companyId: string): Promise<SupplierWithBalance[]> {
     if (!isSupabaseConfigured()) return [];
     const { data, error } = await supabase
       .from('suppliers')
@@ -68,7 +112,7 @@ export const api = {
   },
 
   // Ledgers
-  async getLedgers(): Promise<(Ledger & { group_name: string; balance: number })[]> {
+  async getLedgers(companyId: string): Promise<(Ledger & { group_name: string; balance: number })[]> {
     if (!isSupabaseConfigured()) return [];
     const { data, error } = await supabase
       .from('ledgers')
@@ -86,11 +130,12 @@ export const api = {
   },
 
   // Day Book
-  async getDayBook(fromDate?: string, toDate?: string): Promise<DayBookEntry[]> {
+  async getDayBook(companyId: string, fromDate?: string, toDate?: string): Promise<DayBookEntry[]> {
     if (!isSupabaseConfigured()) return [];
     const query = supabase
       .from('vouchers')
       .select('*')
+      .eq('company_id', companyId)
       .order('date', { ascending: false });
     
     if (fromDate) query.gte('date', fromDate);
@@ -113,7 +158,7 @@ export const api = {
   },
 
   // Stock Summary
-  async getStockSummary(): Promise<StockSummary[]> {
+  async getStockSummary(companyId: string): Promise<StockSummary[]> {
     if (!isSupabaseConfigured()) return [];
     const { data, error } = await supabase
       .from('products')
@@ -134,4 +179,64 @@ export const api = {
       is_below_minimum: false,
     }));
   },
+
+  // ============================================================
+  // Analytics RPCs
+  // ============================================================
+
+  async getAnalyticsMonthlyItems(companyId: string, year: number) {
+    if (!isSupabaseConfigured()) return [];
+    const { data, error } = await supabase.rpc('get_analytics_monthly_items', {
+      p_company_id: companyId,
+      p_year: year,
+    });
+    if (error) {
+      console.warn('Analytics monthly items error:', error.message);
+      return [];
+    }
+    return data || [];
+  },
+
+  async getAnalyticsCategories(companyId: string, startDate: string, endDate: string) {
+    if (!isSupabaseConfigured()) return [];
+    const { data, error } = await supabase.rpc('get_analytics_categories', {
+      p_company_id: companyId,
+      p_start_date: startDate,
+      p_end_date: endDate,
+    });
+    if (error) {
+      console.warn('Analytics categories error:', error.message);
+      return [];
+    }
+    return data || [];
+  },
+
+  async getAnalyticsGeography(companyId: string, startDate: string, endDate: string) {
+    if (!isSupabaseConfigured()) return [];
+    const { data, error } = await supabase.rpc('get_analytics_geography', {
+      p_company_id: companyId,
+      p_start_date: startDate,
+      p_end_date: endDate,
+    });
+    if (error) {
+      console.warn('Analytics geography error:', error.message);
+      return [];
+    }
+    return data || [];
+  },
+
+  async getAnalyticsCustomers(companyId: string, startDate: string, endDate: string) {
+    if (!isSupabaseConfigured()) return [];
+    const { data, error } = await supabase.rpc('get_analytics_customers', {
+      p_company_id: companyId,
+      p_start_date: startDate,
+      p_end_date: endDate,
+    });
+    if (error) {
+      console.warn('Analytics customers error:', error.message);
+      return [];
+    }
+    return data || [];
+  },
 };
+
