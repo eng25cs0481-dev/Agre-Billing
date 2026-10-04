@@ -1,6 +1,6 @@
 {
   "name": "agre-billing",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "private": true,
   "description": "Agre Billing — Shop billing and business management application",
   "workspaces": [

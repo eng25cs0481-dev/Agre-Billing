@@ -1,6 +1,6 @@
 [package]
 name = "agre-billing"
-version = "1.0.0"
+version = "1.1.0"
 description = "Agre Billing — Shop billing and accounting desktop application"
 authors = ["Agre"]
 edition = "2021"
