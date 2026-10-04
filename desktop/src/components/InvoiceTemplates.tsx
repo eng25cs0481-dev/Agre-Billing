@@ -31,7 +31,6 @@ export const A4Invoice: React.FC<InvoiceProps> = ({ voucher, company }) => {
           <div>Phone: {company.phone || '9822001122'}</div>
         </div>
         <div style={{ textAlign: 'right' }}>
-          <h2 style={{ margin: 0, fontSize: '20px', color: '#ff6f00', fontWeight: 700 }}>TAX INVOICE / BILL</h2>
           <div style={{ marginTop: '8px' }}><strong>Bill No:</strong> {voucher.voucher_number || 'SAL/000001'}</div>
           <div><strong>Date:</strong> {voucher.date ? formatDateDMY(voucher.date) : '19/08/2026'}</div>
           <div><strong>Payment:</strong> {voucher.payment_mode?.toUpperCase() || 'CASH'}</div>
@@ -52,7 +51,6 @@ export const A4Invoice: React.FC<InvoiceProps> = ({ voucher, company }) => {
             <th style={{ padding: '8px' }}>Item / Description</th>
             <th style={{ padding: '8px', textAlign: 'right', width: '80px' }}>Qty</th>
             <th style={{ padding: '8px', textAlign: 'right', width: '100px' }}>Rate (₹)</th>
-            <th style={{ padding: '8px', textAlign: 'right', width: '90px' }}>Disc (₹)</th>
             <th style={{ padding: '8px', textAlign: 'right', width: '110px' }}>Amount (₹)</th>
           </tr>
         </thead>
@@ -66,7 +64,6 @@ export const A4Invoice: React.FC<InvoiceProps> = ({ voucher, company }) => {
               <td style={{ padding: '8px', fontWeight: 600 }}>{item.product_name}</td>
               <td style={{ padding: '8px', textAlign: 'right' }}>{item.quantity}</td>
               <td style={{ padding: '8px', textAlign: 'right' }}>{formatCurrency(item.rate, '')}</td>
-              <td style={{ padding: '8px', textAlign: 'right' }}>{item.discount_amount ? formatCurrency(item.discount_amount, '') : '—'}</td>
               <td style={{ padding: '8px', textAlign: 'right', fontWeight: 600 }}>{formatCurrency(item.amount, '')}</td>
             </tr>
           ))}
@@ -80,12 +77,6 @@ export const A4Invoice: React.FC<InvoiceProps> = ({ voucher, company }) => {
             <span>Subtotal:</span>
             <span>{formatCurrency(voucher.subtotal || 5500)}</span>
           </div>
-          {Number(voucher.discount_amount) > 0 && (
-            <div style={{ display: 'flex', justifyContent: 'space-between', padding: '4px 0', color: '#d32f2f' }}>
-              <span>Discount:</span>
-              <span>−{formatCurrency(voucher.discount_amount || 0)}</span>
-            </div>
-          )}
           <div style={{ display: 'flex', justifyContent: 'space-between', padding: '8px 0', borderTop: '2px solid #111', fontSize: '16px', fontWeight: 800 }}>
             <span>Total Payable:</span>
             <span>{formatCurrency(voucher.total_amount || 5500)}</span>
@@ -95,7 +86,7 @@ export const A4Invoice: React.FC<InvoiceProps> = ({ voucher, company }) => {
 
       {/* Footer */}
       <div style={{ borderTop: '1px solid #ddd', paddingTop: '16px', textAlign: 'center', fontSize: '11px', color: '#666' }}>
-        Thank you for your business! | Agre Machinery And Hardware Stores
+        Thank you for your business! | {company.name || 'Agre Machinery And Hardware Stores'}
       </div>
     </div>
   );

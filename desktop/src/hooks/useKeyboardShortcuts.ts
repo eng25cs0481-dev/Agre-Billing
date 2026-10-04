@@ -40,8 +40,11 @@ function handleKeyDown(e: KeyboardEvent) {
 
   for (const reg of ordered) {
     for (const shortcut of reg.getShortcuts()) {
+      const isLetter = shortcut.key.length === 1 && /[a-z]/i.test(shortcut.key);
       const keyMatch =
-        e.key === shortcut.key || e.key.toLowerCase() === shortcut.key.toLowerCase();
+        e.key === shortcut.key ||
+        e.key.toLowerCase() === shortcut.key.toLowerCase() ||
+        (isLetter && e.code.toLowerCase() === `key${shortcut.key.toLowerCase()}`);
       const ctrlMatch = !!shortcut.ctrl === (e.ctrlKey || e.metaKey);
       const altMatch = !!shortcut.alt === e.altKey;
       const shiftMatch = !!shortcut.shift === e.shiftKey;
@@ -129,12 +132,15 @@ export function useGlobalShortcuts() {
       { key: 'F9', action: () => navigate('/transactions/purchase'), description: 'Purchase' },
       { key: 'Escape', action: () => navigate(-1), description: 'Back' },
       { key: 'k', alt: true, action: () => navigate('/select-company'), description: 'Company Menu' },
+      { key: 'k', ctrl: true, action: () => navigate('/select-company'), description: 'Company Menu (Cmd+K)' },
       { key: 'y', alt: true, action: () => navigate('/utilities/sync'), description: 'Data Menu' },
       { key: 'z', alt: true, action: () => navigate('/utilities/sync'), description: 'Exchange Menu' },
       { key: 'g', alt: true, action: () => navigate('/'), description: 'Go To' },
+      { key: 'g', ctrl: true, action: () => navigate('/'), description: 'Go To (Cmd+G)' },
       { key: 'o', alt: true, action: () => navigate('/utilities/import'), description: 'Import Data' },
       { key: 'e', alt: true, action: () => navigate('/utilities/export'), description: 'Export Data' },
       { key: 'p', alt: true, action: () => window.print(), description: 'Print' },
+      { key: 'p', ctrl: true, action: () => window.print(), description: 'Print' },
       { key: 'F1', action: () => alert('Agre Billing Help & Shortcuts: F5=Payment, F6=Receipt, F8=Sales, F9=Purchase, Ctrl+S=Save, Esc=Quit'), description: 'Help' },
     ],
     GLOBAL_PRIORITY

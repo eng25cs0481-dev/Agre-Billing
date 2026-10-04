@@ -22,6 +22,7 @@ import PurchaseVoucherPage from './pages/transactions/PurchaseVoucherPage';
 import ReceiptVoucherPage from './pages/transactions/ReceiptVoucherPage';
 import PaymentVoucherPage from './pages/transactions/PaymentVoucherPage';
 import ExpenseVoucherPage from './pages/transactions/ExpenseVoucherPage';
+import OrderEntryPage from './pages/transactions/OrderEntryPage';
 
 // Reports
 import DayBookPage from './pages/reports/DayBookPage';
@@ -67,6 +68,7 @@ export default function App() {
 
           {/* Transactions */}
           <Route path="/transactions/sale" element={<SaleVoucherPage />} />
+          <Route path="/transactions/order" element={<OrderEntryPage />} />
           <Route path="/transactions/purchase" element={<PurchaseVoucherPage />} />
           <Route path="/transactions/receipt" element={<ReceiptVoucherPage />} />
           <Route path="/transactions/payment" element={<PaymentVoucherPage />} />

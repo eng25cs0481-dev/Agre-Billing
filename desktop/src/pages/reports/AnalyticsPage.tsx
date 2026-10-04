@@ -191,7 +191,7 @@ export default function AnalyticsPage() {
                   <CartesianGrid strokeDasharray="3 3" stroke="#e2e8f0" />
                   <XAxis dataKey="month" tick={{ fontSize: 10 }} />
                   <YAxis tick={{ fontSize: 10 }} tickFormatter={(v) => `₹${(v / 1000).toFixed(0)}k`} />
-                  <Tooltip formatter={(v: number) => [`₹${v.toLocaleString('en-IN')}`, 'Revenue']} />
+                  <Tooltip formatter={(v: any) => [`₹${Number(v || 0).toLocaleString('en-IN')}`, 'Revenue']} />
                   <Line type="monotone" dataKey="revenue" stroke="#2563eb" strokeWidth={2.5} dot={{ fill: '#2563eb', r: 4 }} />
                 </LineChart>
               </ResponsiveContainer>
@@ -210,14 +210,14 @@ export default function AnalyticsPage() {
                         nameKey="category_name"
                         cx="50%" cy="50%"
                         outerRadius={70} innerRadius={35}
-                        label={({ category_name, percent }) => `${category_name} ${(percent * 100).toFixed(0)}%`}
+                        label={(entry: any) => `${entry.category_name} ${((entry.percent || 0) * 100).toFixed(0)}%`}
                         labelLine={false}
                       >
                         {categories.map((_, i) => (
                           <Cell key={i} fill={COLORS[i % COLORS.length]} />
                         ))}
                       </Pie>
-                      <Tooltip formatter={(v: number) => `₹${v.toLocaleString('en-IN')}`} />
+                      <Tooltip formatter={(v: any) => `₹${Number(v || 0).toLocaleString('en-IN')}`} />
                     </PieChart>
                   </ResponsiveContainer>
                 ) : (
@@ -253,7 +253,7 @@ export default function AnalyticsPage() {
                     <CartesianGrid strokeDasharray="3 3" stroke="#e2e8f0" />
                     <XAxis dataKey="name" tick={{ fontSize: 9 }} angle={-25} textAnchor="end" height={60} />
                     <YAxis tick={{ fontSize: 10 }} tickFormatter={(v) => `₹${(v / 1000).toFixed(0)}k`} />
-                    <Tooltip formatter={(v: number) => `₹${v.toLocaleString('en-IN')}`} />
+                    <Tooltip formatter={(v: any) => `₹${Number(v || 0).toLocaleString('en-IN')}`} />
                     <Bar dataKey="revenue" name="Revenue" radius={[4, 4, 0, 0]}>
                       {topProducts.map((_, i) => (
                         <Cell key={i} fill={COLORS[i % COLORS.length]} />
@@ -303,14 +303,14 @@ export default function AnalyticsPage() {
                       nameKey="category_name"
                       cx="50%" cy="50%"
                       outerRadius={100} innerRadius={50}
-                      label={({ category_name, percent }) => `${category_name} (${(percent * 100).toFixed(1)}%)`}
+                      label={(entry: any) => `${entry.category_name} ${((entry.percent || 0) * 100).toFixed(1)}%`}
                     >
                       {categories.map((_, i) => (
                         <Cell key={i} fill={COLORS[i % COLORS.length]} />
                       ))}
                     </Pie>
                     <Legend verticalAlign="bottom" height={36} />
-                    <Tooltip formatter={(v: number) => `₹${v.toLocaleString('en-IN')}`} />
+                    <Tooltip formatter={(v: any) => `₹${Number(v || 0).toLocaleString('en-IN')}`} />
                   </PieChart>
                 </ResponsiveContainer>
 
@@ -351,7 +351,7 @@ export default function AnalyticsPage() {
                     <CartesianGrid strokeDasharray="3 3" stroke="#e2e8f0" />
                     <XAxis type="number" tick={{ fontSize: 10 }} tickFormatter={(v) => `₹${(v / 1000).toFixed(0)}k`} />
                     <YAxis dataKey="city" type="category" tick={{ fontSize: 10 }} width={120} />
-                    <Tooltip formatter={(v: number) => `₹${v.toLocaleString('en-IN')}`} />
+                    <Tooltip formatter={(v: any) => `₹${Number(v || 0).toLocaleString('en-IN')}`} />
                     <Bar dataKey="total_revenue" name="Revenue" radius={[0, 4, 4, 0]}>
                       {geography.slice(0, 15).map((_, i) => (
                         <Cell key={i} fill={COLORS[i % COLORS.length]} />
@@ -401,7 +401,7 @@ export default function AnalyticsPage() {
                     <CartesianGrid strokeDasharray="3 3" stroke="#e2e8f0" />
                     <XAxis type="number" tick={{ fontSize: 10 }} tickFormatter={(v) => `₹${(v / 1000).toFixed(0)}k`} />
                     <YAxis dataKey="customer_name" type="category" tick={{ fontSize: 10 }} width={150} />
-                    <Tooltip formatter={(v: number) => `₹${v.toLocaleString('en-IN')}`} />
+                    <Tooltip formatter={(v: any) => `₹${Number(v || 0).toLocaleString('en-IN')}`} />
                     <Bar dataKey="total_revenue" name="Revenue" radius={[0, 4, 4, 0]}>
                       {customers.slice(0, 10).map((_, i) => (
                         <Cell key={i} fill={COLORS[i % COLORS.length]} />

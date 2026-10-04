@@ -24,6 +24,7 @@ export default function AppLayout() {
   const getScreenTitle = () => {
     const p = location.pathname;
     if (p === '/') return 'Gateway of Agre';
+    if (p.includes('/transactions/order')) return 'Accounting Voucher Creation (Order Entry)';
     if (p.includes('/transactions/sale')) return 'Accounting Voucher Creation (Sales)';
     if (p.includes('/transactions/purchase')) return 'Accounting Voucher Creation (Purchase)';
     if (p.includes('/transactions/receipt')) return 'Accounting Voucher Creation (Receipt)';
@@ -139,6 +140,9 @@ export default function AppLayout() {
           <div className={`tp-fbar-btn ${location.pathname.includes('/sale') ? 'active' : ''}`} onClick={() => navigate('/transactions/sale')}>
             <span>F8: Sales</span>
           </div>
+          <div className={`tp-fbar-btn ${location.pathname.includes('/order') ? 'active' : ''}`} onClick={() => navigate('/transactions/order')}>
+            <span>O: Order</span>
+          </div>
           <div className={`tp-fbar-btn ${location.pathname.includes('/purchase') ? 'active' : ''}`} onClick={() => navigate('/transactions/purchase')}>
             <span>F9: Purchase</span>
           </div>
@@ -182,8 +186,11 @@ export default function AppLayout() {
         <button className="tp-bottom-btn" onClick={() => window.print()}>
           <kbd>Ctrl+P</kbd>: Print
         </button>
-        <button className="tp-bottom-btn" onClick={() => navigate('/masters/products')}>
+        <button className="tp-bottom-btn" onClick={() => navigate('/transactions/sale')}>
           <kbd>F8</kbd>: Sales
+        </button>
+        <button className="tp-bottom-btn" onClick={() => navigate('/transactions/order')}>
+          <kbd>Alt+O</kbd>: Orders
         </button>
         <button className="tp-bottom-btn" onClick={() => navigate('/reports/daybook')}>
           <kbd>D</kbd>: Day Book

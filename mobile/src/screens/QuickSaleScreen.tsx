@@ -29,6 +29,7 @@ export const QuickSaleScreen: React.FC<QuickSaleProps> = ({ onBack, voucherType 
   const [parties, setParties] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [showPartySuggestions, setShowPartySuggestions] = useState(false);
+  const [voucherNo, setVoucherNo] = useState('');
 
   const [customerName, setCustomerName] = useState(
     voucherType === 'wholesale' || voucherType === 'purchase' ? '' : 'Walk-in Customer'
@@ -55,6 +56,27 @@ export const QuickSaleScreen: React.FC<QuickSaleProps> = ({ onBack, voucherType 
           .order('name');
         if (partiesError) console.error(`Error fetching ${partyTable}:`, partiesError);
         if (partiesData) setParties(partiesData);
+
+        // Fetch voucher number
+        const prefix = voucherType === 'purchase' ? 'PUR/' : 'SAL/';
+        const { data: voucherData } = await supabase
+          .from('vouchers')
+          .select('voucher_number')
+          .eq('company_id', company.id)
+          .ilike('voucher_number', `${prefix}%`)
+          .order('created_at', { ascending: false })
+          .limit(1);
+
+        let nextNo = `${prefix}000001`;
+        if (voucherData && voucherData.length > 0) {
+          const lastNumStr = voucherData[0].voucher_number.replace(prefix, '');
+          const lastNum = parseInt(lastNumStr, 10);
+          if (!isNaN(lastNum)) {
+            nextNo = `${prefix}${String(lastNum + 1).padStart(6, '0')}`;
+          }
+        }
+        setVoucherNo(nextNo);
+
       } catch (err) {
         console.error('Error fetching data for sale screen:', err);
       } finally {
@@ -123,9 +145,12 @@ export const QuickSaleScreen: React.FC<QuickSaleProps> = ({ onBack, voucherType 
         <TouchableOpacity onPress={onBack} style={styles.backBtn}>
           <Feather name="arrow-left" size={24} color="#0f172a" />
         </TouchableOpacity>
-        <Text style={styles.title}>
-          {voucherType === 'wholesale' ? 'Wholesale Sale' : voucherType === 'purchase' ? 'Purchase Entry' : 'Retail Sale'}
-        </Text>
+        <View style={{ alignItems: 'center' }}>
+          <Text style={styles.title}>
+            {voucherType === 'wholesale' ? 'Wholesale Sale' : voucherType === 'purchase' ? 'Purchase Entry' : 'Retail Sale'}
+          </Text>
+          <Text style={{ fontSize: 12, color: '#64748b', fontWeight: 'bold', marginTop: 2 }}>{voucherNo}</Text>
+        </View>
         <TouchableOpacity onPress={() => setCart([])} style={styles.clearBtn}>
           <Text style={styles.clearBtnText}>Clear</Text>
         </TouchableOpacity>

@@ -2,6 +2,7 @@
   "extends": "../tsconfig.base.json",
   "compilerOptions": {
     "jsx": "react-native",
+    "ignoreDeprecations": "6.0",
     "baseUrl": ".",
     "paths": {
       "@agre/shared/*": ["../shared/src/*"],
@@ -9,5 +10,6 @@
     },
     "noEmit": true
   },
-  "include": ["src/**/*", "../shared/src/**/*"]
+  "include": ["src/**/*", "../shared/src/**/*"],
+  "exclude": ["../shared/src/**/*.test.ts"]
 }

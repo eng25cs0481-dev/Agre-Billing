@@ -27,6 +27,7 @@ const GATEWAY_MENU: MenuCategory[] = [
     title: 'Transactions',
     items: [
       { label: 'Sales Voucher', hotkey: 'F8', path: '/transactions/sale' },
+      { label: 'Order Entry / Take Order', hotkey: 'O', path: '/transactions/order' },
       { label: 'Purchase Voucher', hotkey: 'F9', path: '/transactions/purchase' },
       { label: 'Receipt Voucher', hotkey: 'R', path: '/transactions/receipt' },
       { label: 'Payment Voucher', hotkey: 'Y', path: '/transactions/payment' },

@@ -8,6 +8,9 @@ import type { VoucherItemInput, PaymentMode } from '@agre/shared/types';
 import { A4Invoice } from '../../components/InvoiceTemplates';
 import Autocomplete, { type AutocompleteOption } from '../../components/Autocomplete';
 import { useMasters } from '../../stores/mastersStore';
+import { useAppStore } from '../../stores/appStore';
+import { useOrderStore, type PendingOrder } from '../../stores/orderStore';
+import { api } from '../../services/api';
 
 interface CartItem extends VoucherItemInput {
   _key: string;
@@ -16,16 +19,22 @@ interface CartItem extends VoucherItemInput {
 
 export default function SaleVoucherPage() {
   const navigate = useNavigate();
+  const company = useAppStore((s) => s.company);
   const { customers, products } = useMasters();
   const [voucherNo, setVoucherNo] = useState('SAL/000001');
   const [partyName, setPartyName] = useState('');
   const [partyBalance, setPartyBalance] = useState('0.00');
   const [paymentMode, setPaymentMode] = useState<PaymentMode>('cash');
+  const [priceLevel, setPriceLevel] = useState<'selling_price' | 'wholesale_price' | 'special_price' | 'cost_price'>('selling_price');
   const [narration, setNarration] = useState('Being goods sold.');
   const [billDiscount, setBillDiscount] = useState(0);
   const [showPrintModal, setShowPrintModal] = useState(false);
   const [showPreview, setShowPreview] = useState(false);
   const [saved, setSaved] = useState(false);
+  const [showOrderQueue, setShowOrderQueue] = useState(false);
+  const [activeOrderId, setActiveOrderId] = useState<string | null>(null);
+
+  const { orders, removeOrder } = useOrderStore();
 
   const [items, setItems] = useState<CartItem[]>([
     { _key: '1', product_name: '', quantity: 1, rate: 0, unit: 'pcs', discount_percent: 0, discount_amount: 0 },
@@ -49,6 +58,27 @@ export default function SaleVoucherPage() {
       prev.map((item) => (item._key === key ? { ...item, [field]: value } : item))
     );
   }, []);
+
+  // Fetch latest voucher number on load
+  React.useEffect(() => {
+    if (company?.id) {
+      api.getLatestVoucherNumber(company.id, 'SAL/').then(setVoucherNo);
+    }
+  }, [company]);
+
+  // When price level changes, automatically update the rate for already selected products
+  React.useEffect(() => {
+    setItems((prev) =>
+      prev.map((item) => {
+        if (!item.product_name) return item;
+        const p = products.find((prod) => prod.name === item.product_name);
+        if (p) {
+          return { ...item, rate: p[priceLevel] || p.selling_price || 0 };
+        }
+        return item;
+      })
+    );
+  }, [priceLevel, products]);
 
   // Master-data suggestions
   const customerOptions = useMemo<AutocompleteOption[]>(
@@ -87,13 +117,13 @@ export default function SaleVoucherPage() {
           ? {
               ...item,
               product_name: opt.label,
-              rate: p?.selling_price || item.rate,
+              rate: p ? p[priceLevel] || p.selling_price || 0 : item.rate,
               unit: p?.unit_symbol || item.unit,
             }
           : item
       )
     );
-  }, []);
+  }, [priceLevel]);
 
   const validItems = items.filter((i) => i.product_name && i.quantity > 0 && i.rate > 0);
   const totals = calculateBillTotals(validItems, billDiscount);
@@ -101,11 +131,18 @@ export default function SaleVoucherPage() {
   const handleSave = useCallback(() => {
     if (validItems.length === 0) return;
     setSaved(true);
+    
+    // If it came from an order, remove it from the queue
+    if (activeOrderId) {
+      removeOrder(activeOrderId);
+      setActiveOrderId(null);
+    }
+    
     setTimeout(() => {
       setSaved(false);
       setShowPrintModal(true);
     }, 500);
-  }, [validItems]);
+  }, [validItems, activeOrderId, removeOrder]);
 
   useKeyboardShortcuts([
     { key: 's', ctrl: true, action: handleSave, description: 'Save' },
@@ -130,6 +167,15 @@ export default function SaleVoucherPage() {
               style={{ width: 130, marginLeft: 6 }}
             />
           </div>
+          {orders.length > 0 && (
+            <button 
+              className="tp-btn primary" 
+              onClick={() => setShowOrderQueue(true)}
+              style={{ padding: '4px 12px', background: '#e65100', borderColor: '#e65100', fontSize: 12, borderRadius: 4 }}
+            >
+              Pending Orders ({orders.length})
+            </button>
+          )}
         </div>
         <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
           {saved && <span style={{ color: '#15803d', fontWeight: 'bold' }}>✓ Saved Successfully</span>}
@@ -168,6 +214,22 @@ export default function SaleVoucherPage() {
           <option value="credit">Credit (Sundry Debtor)</option>
           <option value="upi">UPI / Online</option>
           <option value="bank">Bank Transfer</option>
+        </select>
+      </div>
+
+      <div className="tp-voucher-party-row" style={{ padding: '0 8px' }}>
+        <span className="tp-party-label">Price Level</span>
+        <span className="tp-colon">:</span>
+        <select
+          className="tp-party-input"
+          value={priceLevel}
+          onChange={(e) => setPriceLevel(e.target.value as any)}
+          style={{ maxWidth: 160 }}
+        >
+          <option value="selling_price">Retail Price</option>
+          <option value="wholesale_price">Wholesale Price</option>
+          <option value="special_price">Special Price</option>
+          <option value="cost_price">Cost Price</option>
         </select>
       </div>
 
@@ -377,13 +439,54 @@ export default function SaleVoucherPage() {
                 })),
               }}
               company={{
-                name: 'Agre Machinery And Hardware Stores',
-                address: 'Main Market Road',
-                city: 'Pune',
-                state: 'Maharashtra',
-                phone: '9822001122',
+                name: company?.name || 'Agre Billing',
+                address: company?.address || '',
+                city: company?.city || '',
+                state: company?.state || '',
+                phone: company?.phone || '',
               }}
             />
+          </div>
+        </div>
+      )}
+
+      {/* Order Queue Modal */}
+      {showOrderQueue && (
+        <div className="tp-modal-overlay" onClick={() => setShowOrderQueue(false)}>
+          <div style={{ background: '#ffffff', width: '600px', maxHeight: '80vh', overflow: 'auto', padding: 20, boxShadow: '0 8px 30px rgba(0,0,0,0.5)', borderRadius: 4 }} onClick={(e) => e.stopPropagation()}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 12, borderBottom: '1px solid #ccc', paddingBottom: 8 }}>
+              <h3 style={{ margin: 0, color: '#e65100' }}>Pending Orders Queue</h3>
+              <span style={{ cursor: 'pointer', fontWeight: 'bold' }} onClick={() => setShowOrderQueue(false)}>✕</span>
+            </div>
+            
+            {orders.length === 0 ? (
+              <div style={{ padding: 20, textAlign: 'center', color: '#666' }}>No pending orders.</div>
+            ) : (
+              <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
+                {orders.map(order => (
+                  <div key={order.id} style={{ border: '1px solid #e2e8f0', padding: 12, borderRadius: 4, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                    <div>
+                      <div style={{ fontWeight: 600, fontSize: 14 }}>{order.customerName}</div>
+                      <div style={{ fontSize: 12, color: '#64748b' }}>
+                        {order.items.length} items • {new Date(order.createdAt).toLocaleTimeString()}
+                      </div>
+                    </div>
+                    <button 
+                      className="tp-btn primary"
+                      onClick={() => {
+                        setPartyName(order.customerName);
+                        setPriceLevel(order.priceLevel as any);
+                        setItems(order.items);
+                        setActiveOrderId(order.id);
+                        setShowOrderQueue(false);
+                      }}
+                    >
+                      Convert to Bill
+                    </button>
+                  </div>
+                ))}
+              </div>
+            )}
           </div>
         </div>
       )}

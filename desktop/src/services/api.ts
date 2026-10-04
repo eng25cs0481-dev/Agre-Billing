@@ -180,6 +180,28 @@ export const api = {
     }));
   },
 
+  // Auto-increment Voucher Number
+  async getLatestVoucherNumber(companyId: string, prefix: string = 'SAL/'): Promise<string> {
+    if (!isSupabaseConfigured()) return `${prefix}000001`;
+    const { data, error } = await supabase
+      .from('vouchers')
+      .select('voucher_number')
+      .eq('company_id', companyId)
+      .ilike('voucher_number', `${prefix}%`)
+      .order('created_at', { ascending: false })
+      .limit(1);
+
+    if (error || !data || data.length === 0) {
+      return `${prefix}000001`;
+    }
+
+    const lastNumStr = data[0].voucher_number.replace(prefix, '');
+    const lastNum = parseInt(lastNumStr, 10);
+    if (isNaN(lastNum)) return `${prefix}000001`;
+    
+    return `${prefix}${String(lastNum + 1).padStart(6, '0')}`;
+  },
+
   // ============================================================
   // Analytics RPCs
   // ============================================================
